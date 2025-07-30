@@ -1,0 +1,19 @@
+{
+  "name": "aphasia-analysis",
+  "version": "1.0.0",
+  "main": "script.js",
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node ./src/script.js"
+  },
+  "devDependencies": {},
+  "dependencies": {
+    "dotenv": "^17.2.1",
+    "openai": "^5.11.0"
+  },
+  "author": "Jackson Knepper",
+  "license": "ISC",
+  "description": ""
+}
+  

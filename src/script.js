@@ -68,7 +68,7 @@ export async function decodeMp3(fileNum) {
         const audioBuffer = await decodeAudio(audioFile);
         const channelData = audioBuffer.getChannelData(0);
         const fullAudio = base64EncodeAudio(channelData);
-        console.log(fullAudio); // This should just be straight data
+        // console.log(fullAudio); // This should just be straight data
 
 
         const event = {
@@ -112,6 +112,15 @@ function waitForOpenConnection(ws) {
   });
 }
 
+
+function handleEvent(data) {
+  const serverEvent = JSON.parse(data);
+  console.log(serverEvent);
+  if (serverEvent.type === "response.audio.delta") {
+    // Access Base64-encoded audio chunks
+    console.log(serverEvent.delta);
+  }
+}
 async function main() {
     await waitForOpenConnection(ws); // Waits on the ws to open then resolves
     // Converts text file into an array of sentences
@@ -125,9 +134,12 @@ async function main() {
 
     await decodeMp3(fileNum);
 
-    ws.on("message", (e) => {
-        console.log("Message from server", e.data)
-    })
+    ws.on("message", handleEvent);
 }
 
 main();
+
+// Potential problems that need to be fixed:
+// There is no response happening from the API:
+// The audio format is off (I Hope not!)
+// I am not sending the right turn concluding event or VAD isn't working quite right to signal my turn has ended

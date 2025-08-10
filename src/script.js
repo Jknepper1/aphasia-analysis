@@ -8,11 +8,9 @@ import decodeAudio from 'audio-decode';
 import wav from "wav"
 
 
-async function getAudio(sentences) {
+async function getAudio(sentences, openai) {
+
     for (let i = 0; i < sentences.length; i++) {
-        const openai = new OpenAI({
-        apiKey: process.env.OPENAI_API_KEY,
-        });
         console.log(`Processing sentence number ${i}`);
 
         // Unique file name with index
@@ -168,10 +166,15 @@ function handleEvent(data) {
 
 async function main() {
 
+  // Initialized only once for speed
+  const openai = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+  });
+  
   // Converts text file into an array of sentences
     const sentences = fs.readFileSync("./src/sentences.txt", "utf8").split("\r\n")
     console.log(sentences);
-    await getAudio(sentences);
+    await getAudio(sentences, openai);
     console.log("Sentences processed!")
 
     // Get the amount of files in the /output directory

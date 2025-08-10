@@ -5,6 +5,7 @@ import path from "path";
 import OpenAI from "openai";
 import WebSocket from "ws";
 import decodeAudio from 'audio-decode';
+import wav from "wav"
 
 
 async function getAudio(sentences) {
@@ -22,7 +23,7 @@ async function getAudio(sentences) {
             model: "gpt-4o-mini-tts",
             voice: "alloy",
             input: sentences[i],
-            instructions: "Speak in a normal tone.",
+            instructions: "Speak every sentence you recieve back as if you had aphasia.",
         });
 
         // builds a buffer from the response from OpenAI
@@ -34,6 +35,10 @@ async function getAudio(sentences) {
         await new Promise((r) => setTimeout(r, 500));
     }
 }
+
+
+// *************************************************************************
+
 
 // Converts Float32Array of audio data to PCM16 ArrayBuffer
 function floatTo16BitPCM(float32Array) {
@@ -60,15 +65,16 @@ function base64EncodeAudio(float32Array) {
   return btoa(binary);
 }
 
+// ************************************************************************
+
+
 export async function decodeMp3(fileNum) {
     for (let i = 0; i < fileNum; i++) {
         const file = path.resolve(`./output/speech${i}.mp3`)
-        console.log(file);
         const audioFile = await fsp.readFile(file);
         const audioBuffer = await decodeAudio(audioFile);
         const channelData = audioBuffer.getChannelData(0);
         const fullAudio = base64EncodeAudio(channelData);
-        // console.log(fullAudio); // This should just be straight data
 
 
         const event = {
@@ -84,8 +90,11 @@ export async function decodeMp3(fileNum) {
                 ],
             },
         };
+        console.log(`sentence ${i}`)
+        await ws.send(JSON.stringify(event));
+        await ws.send(JSON.stringify({ type: "response.create"})) // This should trigger the building of a response object based upon the last message sent
 
-        ws.send(JSON.stringify(event));
+        await new Promise(res => {resolveResponseDone = res})
     }
 }
 
@@ -101,6 +110,8 @@ const ws = new WebSocket(url, {
   }
 });
 
+ws.on("message", handleEvent);
+
 ws.on("open", function open() {
   console.log("Connected to server.");
 });
@@ -112,17 +123,38 @@ function waitForOpenConnection(ws) {
   });
 }
 
+let pcmChunks = [];
+let resolveResponseDone;
 
 function handleEvent(data) {
   const serverEvent = JSON.parse(data);
-  console.log(serverEvent);
+
   if (serverEvent.type === "response.audio.delta") {
     // Access Base64-encoded audio chunks
-    console.log(serverEvent.delta);
+    pcmChunks.push(Buffer.from(serverEvent.delta, "base64"))
   }
+
+  if (serverEvent.type === "response.audio.done") {
+    const pcm = Buffer.concat(pcmChunks);
+    pcmChunks = [];
+
+    const writer = new wav.FileWriter(
+      `./aphasia/assistant-${Date.now()}.wav`,
+      { channels: 1, sampleRate: 24000, bitDepth: 16 }
+    );
+    writer.write(pcm);
+    writer.end(() => console.log("💾 assistant-XX.wav written"));
+
+    if (resolveResponseDone) { resolveResponseDone(); resolveResponseDone = null; } // Wait for audio.done before decode loop continues
+  }
+
+  
 }
+
+
 async function main() {
     await waitForOpenConnection(ws); // Waits on the ws to open then resolves
+
     // Converts text file into an array of sentences
     const sentences = fs.readFileSync("./src/sentences.txt", "utf8").split("\r\n")
     console.log(sentences);
@@ -133,13 +165,6 @@ async function main() {
     const fileNum = files.length;
 
     await decodeMp3(fileNum);
-
-    ws.on("message", handleEvent);
 }
 
 main();
-
-// Potential problems that need to be fixed:
-// There is no response happening from the API:
-// The audio format is off (I Hope not!)
-// I am not sending the right turn concluding event or VAD isn't working quite right to signal my turn has ended

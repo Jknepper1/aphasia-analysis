@@ -11,6 +11,7 @@
     "audio-decode": "^2.2.3",
     "dotenv": "^17.2.1",
     "openai": "^5.11.0",
+    "wav": "^1.0.2",
     "ws": "^8.18.3"
   },
   "author": "Jackson Knepper",

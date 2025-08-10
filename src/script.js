@@ -23,7 +23,7 @@ async function getAudio(sentences) {
             model: "gpt-4o-mini-tts",
             voice: "alloy",
             input: sentences[i],
-            instructions: "Speak every sentence you recieve back as if you had aphasia.",
+            instructions: "Speak in a normal tone.",
         });
 
         // builds a buffer from the response from OpenAI
@@ -69,6 +69,7 @@ function base64EncodeAudio(float32Array) {
 
 
 export async function decodeMp3(fileNum) {
+  console.log("mp3decode called")
     for (let i = 0; i < fileNum; i++) {
         const file = path.resolve(`./output/speech${i}.mp3`)
         const audioFile = await fsp.readFile(file);
@@ -112,22 +113,35 @@ const ws = new WebSocket(url, {
 
 ws.on("message", handleEvent);
 
-ws.on("open", function open() {
-  console.log("Connected to server.");
+
+ws.on("close", (code, reason) => {
+  console.warn("WS closed:", code, reason?.toString());
 });
 
 
-function waitForOpenConnection(ws) {
-  return new Promise((resolve) => {
-    ws.on("open", resolve);
-  });
-}
+ws.on("open", function open() {
+  console.log("Connected to server."); 
+});
 
 let pcmChunks = [];
 let resolveResponseDone;
 
 function handleEvent(data) {
   const serverEvent = JSON.parse(data);
+
+  if (serverEvent.type === "session.created") {
+    console.log("Session created");
+    ws.send(JSON.stringify({
+      type: "session.update",
+      session: {
+        instructions: "Speak as if you have aphasia. Directly repeat back the phase given to you in your aphasia simulated voice."
+      }
+    }));
+  }
+
+  if (serverEvent.type === "session.updated") {
+    console.log("Session updated!")
+  }
 
   if (serverEvent.type === "response.audio.delta") {
     // Access Base64-encoded audio chunks
@@ -153,12 +167,12 @@ function handleEvent(data) {
 
 
 async function main() {
-    await waitForOpenConnection(ws); // Waits on the ws to open then resolves
 
-    // Converts text file into an array of sentences
+  // Converts text file into an array of sentences
     const sentences = fs.readFileSync("./src/sentences.txt", "utf8").split("\r\n")
     console.log(sentences);
     await getAudio(sentences);
+    console.log("Sentences processed!")
 
     // Get the amount of files in the /output directory
     const files= await fsp.readdir("./output");

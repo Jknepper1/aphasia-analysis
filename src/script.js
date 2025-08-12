@@ -1,5 +1,4 @@
 import "dotenv/config";
-import fsp from "fs/promises";
 import fs from "fs";
 import path from "path";
 import OpenAI from "openai";
@@ -7,7 +6,11 @@ import WebSocket from "ws";
 import decodeAudio from 'audio-decode';
 import wav from "wav"
 
+// Prompt for Aphasia text is set here
+const prompt = fs.readFileSync("./src/prompts/prompt1.txt").toString()
+console.log(prompt)
 
+// Initial TTS conversion for normal english sentences
 async function getAudio(sentences, openai) {
 
     for (let i = 0; i < sentences.length; i++) {
@@ -35,9 +38,7 @@ async function getAudio(sentences, openai) {
 }
 
 
-// *************************************************************************
-
-
+// Helper functions for mp3 decoding *************************************************************************
 // Converts Float32Array of audio data to PCM16 ArrayBuffer
 function floatTo16BitPCM(float32Array) {
   const buffer = new ArrayBuffer(float32Array.length * 2);
@@ -62,15 +63,13 @@ function base64EncodeAudio(float32Array) {
   }
   return btoa(binary);
 }
-
-// ************************************************************************
-
+// ********************************************************************************************************** //
 
 export async function decodeMp3(fileNum) {
   console.log("mp3decode called")
     for (let i = 0; i < fileNum; i++) {
         const file = path.resolve(`./output/speech${i}.mp3`)
-        const audioFile = await fsp.readFile(file);
+        const audioFile = fs.readFileSync(file);
         const audioBuffer = await decodeAudio(audioFile);
         const channelData = audioBuffer.getChannelData(0);
         const fullAudio = base64EncodeAudio(channelData);
@@ -97,10 +96,20 @@ export async function decodeMp3(fileNum) {
     }
 }
 
+// Takes aphasia audio and converts to text
+async function aphasiaToText(openai) {
+  const files = fs.readdirSync("./aphasia");
+  for (const file of files) {
+    const transcription = await openai.audio.transcriptions.create({
+    file: fs.createReadStream(file),
+    model: "gpt-4o-transcribe"
+    })
 
-// MAIN RUNNING LOGIC *****************************************************************************************
+    console.log(transcription.text);
+  }
+};
 
-// Websocket logic
+// Websocket logic ************************************************************************************************************
 const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
 const ws = new WebSocket(url, {
   headers: {
@@ -132,7 +141,7 @@ function handleEvent(data) {
     ws.send(JSON.stringify({
       type: "session.update",
       session: {
-        instructions: "Speak as if you have aphasia. Directly repeat back the phase given to you in your aphasia simulated voice."
+        instructions: prompt // Prompt set by variable at top of file
       }
     }));
   }
@@ -151,7 +160,7 @@ function handleEvent(data) {
     pcmChunks = [];
 
     const writer = new wav.FileWriter(
-      `./aphasia/assistant-${Date.now()}.wav`,
+      `./aphasia/processed-${Date.now()}.wav`,
       { channels: 1, sampleRate: 24000, bitDepth: 16 }
     );
     writer.write(pcm);
@@ -163,7 +172,7 @@ function handleEvent(data) {
   
 }
 
-
+// MAIN RUNNING LOGIC *****************************************************************************************
 async function main() {
 
   // Initialized only once for speed
@@ -178,10 +187,16 @@ async function main() {
     console.log("Sentences processed!")
 
     // Get the amount of files in the /output directory
-    const files= await fsp.readdir("./output");
+    const files = fs.readdirSync("./output");
     const fileNum = files.length;
 
+    // decodes mp3 data, sends to socket and receives aphasia text
     await decodeMp3(fileNum);
+
+    // Converts aphasia .wavs into sentences and appends to a single file for NLP
+    await aphasiaToText(openai);
+
 }
 
+// Init 
 main();

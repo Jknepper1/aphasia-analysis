@@ -3,3 +3,7 @@
 /dist/
 /output/
 /.vscode/
+/aphasia
+/*.cha
+/*.xls
+/*.cex

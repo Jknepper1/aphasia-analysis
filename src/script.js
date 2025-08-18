@@ -99,13 +99,23 @@ export async function decodeMp3(fileNum) {
 // Takes aphasia audio and converts to text
 async function aphasiaToText(openai) {
   const files = fs.readdirSync("./aphasia");
+  let i = 0;
   for (const file of files) {
     const transcription = await openai.audio.transcriptions.create({
-    file: fs.createReadStream(file),
+    file: fs.createReadStream("./aphasia/" + file),
     model: "gpt-4o-transcribe"
     })
 
     console.log(transcription.text);
+    
+    // Prevents the file from being rewritten each subsequent sentence after the first
+    if (i >= 1) {
+      fs.appendFileSync("./src/aphasiaText/results1.txt", transcription.text + "\n")
+    } else {
+      fs.writeFileSync("./src/aphasiaText/results1.txt", transcription.text + "\n")
+    }
+    // TODO: Implement a method for inserting ellipsis if there is a long enough pause in the audio
+    i++;
   }
 };
 
@@ -119,7 +129,6 @@ const ws = new WebSocket(url, {
 });
 
 ws.on("message", handleEvent);
-
 
 ws.on("close", (code, reason) => {
   console.warn("WS closed:", code, reason?.toString());
@@ -181,7 +190,7 @@ async function main() {
   });
   
   // Converts text file into an array of sentences
-    const sentences = fs.readFileSync("./src/sentences.txt", "utf8").split("\r\n")
+    const sentences = fs.readFileSync("./src/sentences/set1.txt", "utf8").split("\r\n")
     console.log(sentences);
     await getAudio(sentences, openai);
     console.log("Sentences processed!")

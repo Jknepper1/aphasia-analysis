@@ -4,6 +4,6 @@
 /output/
 /.vscode/
 /aphasia
-/*.cha
-/*.xls
-/*.cex
+*.cha
+*.xls
+*.cex

@@ -1,0 +1,9 @@
+Very severe nonfluent: kurland15a, scale03a
+Severe nonfluent: Tucson02a
+Moderate nonfluent: Whiteside08a
+Mild nonfluent: TCU03a
+
+Very severe fluent: adler06a
+Severe fluent: kansas05a (esp. note the "sandwich" section near the end), williamson 23a
+Moderate fluent: kansas14a
+Mild fluent: elman12a (esp. notice influence of comprehension problem on answering the question about making a sandwich)

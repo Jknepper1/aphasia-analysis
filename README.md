@@ -19,7 +19,7 @@ You will need to process a basic text file of input sentences a few times to get
 ### From Input to Output
 Input: .txt file of sentences (see the example set1.txt) - **Ensure there is no trailing newline in your file**
 Aphasia.txt - After running the script you will have your aphasiafied sentences in a .txt file
-CLAN formatting: The easiest way to convert your .txt file to a .cha file is by running it through AI. GPT-5 Does well. It is important to familarize yourself with the CLAN format so that you can confirm your file is set up properly in this step should you choose to use AI 
+CLAN formatting: The easiest way to convert your .txt file to a .cha file is by using ReGex to add *PAR to the beginning of each line. You can also use AI. GPT-5 Does well. It is important to familarize yourself with the CLAN format so that you can confirm your file is set up properly in this step should you choose to use AI 
 
 **Using CLAN**
 

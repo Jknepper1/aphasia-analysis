@@ -7,7 +7,7 @@ import decodeAudio from 'audio-decode';
 import wav from "wav"
 
 // Prompt for Aphasia text is set here
-const prompt = fs.readFileSync("./src/prompts/prompt1.txt").toString()
+const prompt = fs.readFileSync("./src/prompts/genericPrompt1.txt").toString()
 console.log(prompt)
 
 // Initial TTS conversion for normal english sentences
@@ -110,9 +110,9 @@ async function aphasiaToText(openai) {
     
     // Prevents the file from being rewritten each subsequent sentence after the first
     if (i >= 1) {
-      fs.appendFileSync("./src/aphasiaText/results1.txt", transcription.text + "\n")
+      fs.appendFileSync("./src/aphasiaText/scriptResults.txt", transcription.text + "\n")
     } else {
-      fs.writeFileSync("./src/aphasiaText/results1.txt", transcription.text + "\n")
+      fs.writeFileSync("./src/aphasiaText/scriptResults.txt", transcription.text + "\n")
     }
     // TODO: Implement a method for inserting ellipsis if there is a long enough pause in the audio
     i++;

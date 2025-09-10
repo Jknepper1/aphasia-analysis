@@ -4,8 +4,16 @@
 This is a project that takes text, turns it into audio, then utilizes OpenAIs' Realtime AI to producs audio and a transcript of the text as if spoken by someone with Aphasia. The ultimate goal of this project is to be used as a way to quickly test different prompts and eventually OpenAI realtime models for linguistic based accuracy to real people with various types of Aphasia. There could be great value to the world of sppech therapy in understanding how well AI can replicate PWAs as well as understand what their intended meaning and words are. This project is intended to build upon the Aphasiafier project by the BYU CS department.
 
 ### How the script works
-
-
+1. Reads in a text prompt from /prompts
+2. Takes a list of sentences from /sentences
+    1. Calls TTS with a normal tone fore each sentence
+    2. Saves the result to an mp3 in /output
+3. Helper functions prepare audio to be processed by Realtime API
+4. Sends audio to Realtime API through WebSocket connection
+    1. Responses are saved as .wav files in /aphasia
+5. Converts Aphasia audio from Realtime API back to text
+    1. Calls STT model from OpenAI for each .wav file
+    2. First line overwrites then the file is appended to
 
 ## Approach to Using CLAN
 
@@ -31,3 +39,5 @@ Second, now that you have your .cha files with morphology, you an run the EVAL c
 - The command will look like `eval @ =t*PAR: +u +leng` if you only select the participant type when using the GUI. (recomended)
 
 You should now have a spreadsheet generate as an output with a row for each .cha file you inserted into the EVAL command
+
+For more information on the results of the EVAL command go to section 8.5.1 in [this manual.](https://talkbank.org/0info/manuals/CLAN.pdf)

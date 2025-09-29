@@ -29,7 +29,7 @@ Input: .txt file of sentences (see the example set1.txt) - **Ensure there is no 
 Aphasia.txt - After running the script you will have your aphasiafied sentences in a .txt file
 CLAN formatting: The easiest way to convert your .txt file to a .cha file is by using ReGex to add *PAR to the beginning of each line. You can also use AI. GPT-5 Does well. It is important to familarize yourself with the CLAN format so that you can confirm your file is set up properly in this step should you choose to use AI 
 
-**Using CLAN**
+#### **Using CLAN**
 
 First, command CLAN to run morphology on your aphasia text in order to provide more holistic and accurate linguistic measurements.
 The command should look similar to `mor  @ +t*PAR` if you use the GUI interface to build the command (recommended)
@@ -41,3 +41,23 @@ Second, now that you have your .cha files with morphology, you an run the EVAL c
 You should now have a spreadsheet generate as an output with a row for each .cha file you inserted into the EVAL command
 
 For more information on the results of the EVAL command go to section 8.5.1 in [this manual.](https://talkbank.org/0info/manuals/CLAN.pdf)
+
+#### **Using BatchAlign2**
+
+It looks like the Word Error Rate (WER) when BatchAlign2 is used to generate a CHAT transcript from audio is very dependent on the quality of the recordings going into the system. It can vary from 1% to 20% when **REV-AI ** is used according to [this](https://journals.sagepub.com/doi/full/10.1177/09637214241304345#core-bibr14-09637214241304345-1) study, which used BatchALign2's built in benchmarking feature to test varying audio conditions on two-party iterviews and TED speeches.
+
+BatchAlign2 can also analyze CHAT transcripts for morphosyntactic structure. This is extremely accurate in english according to the same study above.
+
+##### What is the difference between a batchalign2 analysis and a CLAN mor -> eval pipeline?
+
+I asked this to chat and here's the summary points:
+
+```
+Why both exist / when to use each
+
+BatchAlign2 + Stanza: Good for initial processing (turning audio → transcript → UD parse). Fast, modern, and multilingual.
+
+CLAN mor + eval: Good for standardized analysis in CHAT/TalkBank corpora. This is what gives you continuity with decades of prior research and published norms.
+
+So in practice, many researchers use BatchAlign2 for transcription/segmentation/alignment, then still run mor and eval in CLAN to get the standardized %mor tier and developmental profiles that can be compared across studies.
+```

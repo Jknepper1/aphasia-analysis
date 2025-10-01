@@ -1,6 +1,5 @@
 import "dotenv/config";
 import fs from "fs"; // Could be cut
-import path from "path"; // Could be cut
 import { getAudio } from "./helpers/tts.js"
 import { aphasiaToText } from "./helpers/transcribe.js";
 import { decodeMp3 } from "./helpers/decode.js";
@@ -78,6 +77,7 @@ async function main() {
   // Converts aphasia .wavs into sentences and appends to a single file for NLP
   await aphasiaToText(openai);
 
+  
   function handleEvent(data) {
     const serverEvent = JSON.parse(data);
 

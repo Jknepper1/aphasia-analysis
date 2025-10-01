@@ -1,5 +1,4 @@
 import decodeAudio from 'audio-decode';
-import WebSocket from "ws";
 import path from "path";
 import fs from "fs";
 
@@ -28,33 +27,12 @@ function base64EncodeAudio(float32Array) {
   return btoa(binary);
 }
 
-export async function decodeMp3(fileNum, ws) {
+export async function decodeMp3(fileNum) {
   console.log("mp3decode called")
-    for (let i = 0; i < fileNum; i++) {
-        const file = path.resolve(`./output/speech${i}.mp3`)
-        const audioFile = fs.readFileSync(file);
-        const audioBuffer = await decodeAudio(audioFile);
-        const channelData = audioBuffer.getChannelData(0);
-        const fullAudio = base64EncodeAudio(channelData);
-
-
-        const event = {
-            type: "conversation.item.create",
-            item: {
-                type: "message",
-                role: "user",
-                content: [
-                    {
-                        type: "input_audio",
-                        audio: fullAudio,
-                    },
-                ],
-            },
-        };
-        console.log(`sentence ${i}`)
-        await ws.send(JSON.stringify(event));
-        await ws.send(JSON.stringify({ type: "response.create"})) // This should trigger the building of a response object based upon the last message sent
-
-        await new Promise(res => {resolveResponseDone = res})
-    }
+  const file = path.resolve(`./output/speech${fileNum}.mp3`)
+  const audioFile = fs.readFileSync(file);
+  const audioBuffer = await decodeAudio(audioFile);
+  const channelData = audioBuffer.getChannelData(0);
+  const fullAudio = base64EncodeAudio(channelData);
+  return fullAudio;
 }

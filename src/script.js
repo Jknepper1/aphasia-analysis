@@ -8,6 +8,10 @@ import OpenAI from "openai";
 import WebSocket from "ws";
 import wav from "wav";
 
+let pcmChunks = [];
+let continueLoopFn;
+
+
 // MAIN RUNNING LOGIC *****************************************************************************************
 async function main() {
   // Initialized only once for speed
@@ -27,7 +31,7 @@ async function main() {
   // WebSocket setting handlers
   ws.on("message", handleEvent);
   ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
-  ws.on("open", function open() {console.log("Connected to server.")});
+  ws.on("open", function open() {console.log("Connected to WebSocket server.")});
 
   // Prompt for Aphasia text is set here eventually by user input
   const prompt = fs.readFileSync("./src/prompts/genericPrompt1.txt").toString()
@@ -37,30 +41,48 @@ async function main() {
   const outputDir = "output"
   
   // Converts text file into an array of sentences
-  const sentences = fs.readFileSync("./src/sentences/set1.txt", "utf8").split("\r\n") // <-- Update to use REGEX and catch/n too
+  const sentences = fs.readFileSync("./src/sentences/set1.txt", "utf8").split("\r\n") // <-- Update to use REGEX and catch /n too for non-windows machines
   console.log(sentences);
 
   await getAudio(sentences, openai, outputDir);
-  console.log("Sentences processed!")
+  console.log("Sentences converted to normal audio.")
 
   // Get the amount of files in the /output directory
   const files = fs.readdirSync("./output");
   const fileNum = files.length;
+  console.log("Number of files to decode", fileNum);
 
-  // decodes mp3 data, sends to socket and receives aphasia text
-  await decodeMp3(fileNum, ws);
+  for(let i = 0; i < fileNum; i++) {
+    const fullAudio = await decodeMp3(i);
+    // decodes mp3 data, sends to socket and receives aphasia text
+    const event = {
+        type: "conversation.item.create",
+        item: {
+            type: "message",
+            role: "user",
+            content: [
+                {
+                    type: "input_audio",
+                    audio: fullAudio,
+                },
+            ],
+        },
+    };
+    console.log(`sentence ${i}`)
+    ws.send(JSON.stringify(event));
+    ws.send(JSON.stringify({ type: "response.create"})) // This should trigger the building of a response object based upon the last message sent
+    await new Promise((continueLoop) => {continueLoopFn = continueLoop}) // Maintains consistent pacing with API messages by awaiting response.audio.done handler
+  }
+
 
   // Converts aphasia .wavs into sentences and appends to a single file for NLP
   await aphasiaToText(openai);
-
-  let pcmChunks = [];
-  let resolveResponseDone;
 
   function handleEvent(data) {
     const serverEvent = JSON.parse(data);
 
     if (serverEvent.type === "session.created") {
-      console.log("Session created");
+      console.log("API session created.");
       ws.send(JSON.stringify({
         type: "session.update",
         session: {
@@ -70,7 +92,7 @@ async function main() {
     }
 
     if (serverEvent.type === "session.updated") {
-      console.log("Session updated!")
+      console.log("Prompt set in API session.")
     }
 
     if (serverEvent.type === "response.audio.delta") {
@@ -87,14 +109,14 @@ async function main() {
         { channels: 1, sampleRate: 24000, bitDepth: 16 }
       );
       writer.write(pcm);
-      writer.end(() => console.log("💾 assistant-XX.wav written"));
-
-      if (resolveResponseDone) { resolveResponseDone(); resolveResponseDone = null; } // Wait for audio.done before decode loop continues
+      writer.end(() => console.log("processed-XX.wav written"));
+      
+      if (continueLoopFn) {
+        continueLoopFn();
+        continueLoopFn = null;
+      }
     }
-
-    
   }
-
 }
 
 // Init 

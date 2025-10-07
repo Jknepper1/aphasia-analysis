@@ -11,7 +11,7 @@ This is a project that takes text, turns it into audio, then utilizes OpenAIs' R
 3. Helper functions prepare audio to be processed by Realtime API
 4. Sends audio to Realtime API through WebSocket connection
     1. Responses are saved as .wav files in /aphasia
-5. Converts Aphasia audio from Realtime API back to text
+5. Converts Aphasia audio from Realtime API back to text **(This will replaced with BatchALign2 conversion straight to CHAT)**
     1. Calls STT model from OpenAI for each .wav file
     2. First line overwrites then the file is appended to
 
@@ -61,3 +61,6 @@ CLAN mor + eval: Good for standardized analysis in CHAT/TalkBank corpora. This i
 
 So in practice, many researchers use BatchAlign2 for transcription/segmentation/alignment, then still run mor and eval in CLAN to get the standardized %mor tier and developmental profiles that can be compared across studies.
 ```
+
+
+

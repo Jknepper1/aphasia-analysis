@@ -6,6 +6,8 @@ import { decodeMp3 } from "./helpers/decode.js";
 import OpenAI from "openai";
 import WebSocket from "ws";
 import wav from "wav";
+import * as readline from 'node:readline/promises';
+import { stdin } from "node:process";
 
 let pcmChunks = [];
 let continueLoopFn;
@@ -13,6 +15,28 @@ let continueLoopFn;
 
 // MAIN RUNNING LOGIC *****************************************************************************************
 async function main() {
+  // Establish interactive terminal element
+  const rl = readline.createInterface({input: stdin})
+
+  while (true){
+    const prompt = await rl.question("Input the name of your aphasiafier prompt: ")
+    console.log(`The full path to the prompt is /src/prompts/${prompt}`)
+
+    const answer = await rl.question("Is that correct?")
+    if (answer == "Y" || answer == "y") {
+      break;
+    } else {
+      // Do Nothing
+    }
+  } 
+
+  // Output dir is set here eventually by user input
+  const outputDir = await rl.question("Input your desired output directory")
+  console.log(`The full path to the output directory is ${outputDir}`)
+
+  rl.close();
+
+
   // Initialized only once for speed
   const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
@@ -31,13 +55,6 @@ async function main() {
   ws.on("message", handleEvent);
   ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
   ws.on("open", function open() {console.log("Connected to WebSocket server.")});
-
-  // Prompt for Aphasia text is set here eventually by user input
-  const prompt = fs.readFileSync("./src/prompts/genericPrompt1.txt").toString()
-  console.log(prompt)
-
-  // Output dir is set here eventually by user input
-  const outputDir = "output"
   
   // Converts text file into an array of sentences
   const sentences = fs.readFileSync("./src/sentences/set1.txt", "utf8").split("\r\n") // <-- Update to use REGEX and catch /n too for non-windows machines
@@ -70,7 +87,8 @@ async function main() {
     console.log(`sentence ${i}`)
     ws.send(JSON.stringify(event));
     ws.send(JSON.stringify({ type: "response.create"})) // This should trigger the building of a response object based upon the last message sent
-    await new Promise((continueLoop) => {continueLoopFn = continueLoop}) // Maintains consistent pacing with API messages by awaiting response.audio.done handler
+    await new Promise((resolve) => {continueLoopFn = resolve}) // Maintains consistent pacing with API messages by awaiting response.audio.done handler 
+    // continueLoopFn = resolve just makes the resolve function globally accessible so the handleEvent function can see it and execute it. It's like pausing the Promise and then handing the remote to the HandleEvent function
   }
 
 
@@ -112,7 +130,7 @@ async function main() {
       writer.end(() => console.log("processed-XX.wav written"));
       
       if (continueLoopFn) {
-        continueLoopFn();
+        continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above
         continueLoopFn = null;
       }
     }

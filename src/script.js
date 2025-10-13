@@ -20,12 +20,15 @@ async function main() {
   let outputDir;
   let prompt;
 
+
   while (true){
-    prompt = await rl.question("Input the name of your aphasiafier prompt: ")
-    console.log(`The full path to the prompt is /src/prompts/${prompt}`)
+    const file = await rl.question("Input the name of your aphasiafier prompt: ")
+    console.log(`The full path to the prompt is /src/prompts/${file}`)
 
     const ans1 = await rl.question("Is that correct? [Y/n] ")
     if (ans1 == "Y" || ans1 == "y") {
+      prompt = fs.readFileSync(`./src/prompts/${file}`, "utf8")
+      console.log(prompt)
       break;
     }
   } 
@@ -33,7 +36,7 @@ async function main() {
   while (true){
     // Output dir is set here eventually by user input
     outputDir = await rl.question("Input your desired output directory: ")
-    console.log(`The full path to the output directory is: ${outputDir}`)
+    console.log(`The name of your output directory is: ${outputDir}`)
     const ans2 = await rl.question("Is that correct? [Y/n] ")
 
     if (ans2 == "Y" || ans2 == "y") {
@@ -135,7 +138,7 @@ async function main() {
         { channels: 1, sampleRate: 24000, bitDepth: 16 }
       );
       writer.write(pcm);
-      writer.end(() => console.log("processed-XX.wav written"));
+      writer.end(); // () => console.log("processed-XX.wav written")
       
       if (continueLoopFn) {
         continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above

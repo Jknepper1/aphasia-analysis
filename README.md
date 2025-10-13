@@ -62,5 +62,14 @@ CLAN mor + eval: Good for standardized analysis in CHAT/TalkBank corpora. This i
 So in practice, many researchers use BatchAlign2 for transcription/segmentation/alignment, then still run mor and eval in CLAN to get the standardized %mor tier and developmental profiles that can be compared across studies.
 ```
 
+## Talk Bank & API Privacy
 
+TalkBank requires that their data is not shared outside of the platform. This makes things a little tricky when utilizing AI APIs that could potentially collect data for training purposes. It looks like we are in the clear with OpenAI's API though according to their Terms and Conditions:
+
+"Your data is your data. As of March 1, 2023, data sent to the OpenAI API is not used to train or improve OpenAI models (unless you explicitly opt in to share data with us).""
+https://platform.openai.com/docs/guides/your-data
+
+There are some caveats though such as
+
+BatchAlign can be set up to utilize a local (I think?) Whisper1 model or REV AI. REV AI's API seems to be locked down but there is temporary storage involved. This shouldn't be too much of an issue since BatchALign2 is supported by the TAlkBank project.
 

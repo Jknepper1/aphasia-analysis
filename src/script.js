@@ -7,7 +7,7 @@ import OpenAI from "openai";
 import WebSocket from "ws";
 import wav from "wav";
 import * as readline from 'node:readline/promises';
-import { stdin } from "node:process";
+import { stdin, stdout } from "node:process";
 
 let pcmChunks = [];
 let continueLoopFn;
@@ -16,23 +16,31 @@ let continueLoopFn;
 // MAIN RUNNING LOGIC *****************************************************************************************
 async function main() {
   // Establish interactive terminal element
-  const rl = readline.createInterface({input: stdin})
+  const rl = readline.createInterface({input: stdin, output: stdout})
+  let outputDir;
+  let prompt;
 
   while (true){
-    const prompt = await rl.question("Input the name of your aphasiafier prompt: ")
+    prompt = await rl.question("Input the name of your aphasiafier prompt: ")
     console.log(`The full path to the prompt is /src/prompts/${prompt}`)
 
-    const answer = await rl.question("Is that correct?")
-    if (answer == "Y" || answer == "y") {
+    const ans1 = await rl.question("Is that correct? [Y/n] ")
+    if (ans1 == "Y" || ans1 == "y") {
       break;
-    } else {
-      // Do Nothing
     }
   } 
 
-  // Output dir is set here eventually by user input
-  const outputDir = await rl.question("Input your desired output directory")
-  console.log(`The full path to the output directory is ${outputDir}`)
+  while (true){
+    // Output dir is set here eventually by user input
+    outputDir = await rl.question("Input your desired output directory: ")
+    console.log(`The full path to the output directory is: ${outputDir}`)
+    const ans2 = await rl.question("Is that correct? [Y/n] ")
+
+    if (ans2 == "Y" || ans2 == "y") {
+      break;
+    }
+
+  }
 
   rl.close();
 

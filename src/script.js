@@ -19,12 +19,12 @@ async function main() {
   const rl = readline.createInterface({input: stdin, output: stdout})
   let outputDir;
   let prompt;
+  let sentences;
 
 
   while (true){
-    const file = await rl.question("Input the name of your aphasiafier prompt: ")
+    const file = await rl.question("Input the name of your aphasiafier prompt in /src/prompts/: ")
     console.log(`The full path to the prompt is /src/prompts/${file}`)
-
     const ans1 = await rl.question("Is that correct? [Y/n] ")
     if (ans1 == "Y" || ans1 == "y") {
       prompt = fs.readFileSync(`./src/prompts/${file}`, "utf8")
@@ -35,15 +35,27 @@ async function main() {
 
   while (true){
     // Output dir is set here eventually by user input
-    outputDir = await rl.question("Input your desired output directory: ")
-    console.log(`The name of your output directory is: ${outputDir}`)
+    outputDir = await rl.question("Input your desired output directory in /aphasia-analysis/: ")
+    console.log(`The name of your output directory is: /aphasia-analysis/${outputDir}`)
     const ans2 = await rl.question("Is that correct? [Y/n] ")
-
     if (ans2 == "Y" || ans2 == "y") {
       break;
     }
-
   }
+
+  while (true){
+    // Converts text file into an array of sentences
+    const file = await rl.question("Input a set of sentences from /src/sentences/: ")
+    console.log(`The set of sentences to be aphasiafied is: /src/sentences/${file}`)
+    const ans3 = await rl.question("Is that correct? [Y/n] ")
+    if (ans3 == "Y" || ans3 == "y") {
+      sentences = fs.readFileSync(`./src/sentences/${file}`, "utf8").split(/\r?\n/) // <-- REGEX to catch \n for non-windows machines
+      console.log(sentences);
+      break;
+    }
+  }
+
+  
 
   rl.close();
 
@@ -66,10 +78,6 @@ async function main() {
   ws.on("message", handleEvent);
   ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
   ws.on("open", function open() {console.log("Connected to WebSocket server.")});
-  
-  // Converts text file into an array of sentences
-  const sentences = fs.readFileSync("./src/sentences/set1.txt", "utf8").split("\r\n") // <-- Update to use REGEX and catch /n too for non-windows machines
-  console.log(sentences);
 
   await getAudio(sentences, openai, outputDir);
   console.log("Sentences converted to normal audio.")

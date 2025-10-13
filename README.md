@@ -6,7 +6,7 @@ This is a project that takes text, turns it into audio, then utilizes OpenAIs' R
 ### How the script works
 1. Reads in a text prompt from /prompts
 2. Takes a list of sentences from /sentences
-    1. Calls TTS with a normal tone fore each sentence
+    1. Calls TTS with a normal tone fore each sentence (Each input must be separated by a newline w/ no trailing newline at the end of the file)
     2. Saves the result to an mp3 in /output
 3. Helper functions prepare audio to be processed by Realtime API
 4. Sends audio to Realtime API through WebSocket connection
@@ -14,6 +14,8 @@ This is a project that takes text, turns it into audio, then utilizes OpenAIs' R
 5. Converts Aphasia audio from Realtime API back to text **(This will replaced with BatchALign2 conversion straight to CHAT)**
     1. Calls STT model from OpenAI for each .wav file
     2. First line overwrites then the file is appended to
+
+You can input sentence sets, aphasia prompts, and specify an output directory 
 
 ## Approach to Using CLAN
 

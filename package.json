@@ -16,5 +16,5 @@
   },
   "author": "Jackson Knepper",
   "license": "ISC",
-  "description": ""
+  "description": "An AI pipeline for producing replications of language disorder audio utilizing OpenAI's Realtime API and transcription models"
 }

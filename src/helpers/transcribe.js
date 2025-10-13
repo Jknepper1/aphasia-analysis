@@ -10,7 +10,7 @@ export async function aphasiaToText(openai) {
     model: "gpt-4o-transcribe"
     })
 
-    console.log(transcription.text);
+    // console.log(transcription.text);
     
     // Prevents the file from being rewritten each subsequent sentence after the first
     if (i >= 1) {
@@ -19,6 +19,8 @@ export async function aphasiaToText(openai) {
       fs.writeFileSync("./src/aphasiaText/scriptResults.txt", transcription.text + "\n")
     }
     // TODO: Implement a method for inserting ellipsis if there is a long enough pause in the audio
+    // TODO: Don't have the script write to the same file each time, so that multiple runs can be stored
+    // TODO: Have these runs named in a way that relates to the prompt and sentences used in the run
     i++;
   }
 };

@@ -75,3 +75,7 @@ There are some caveats though such as
 
 BatchAlign can be set up to utilize a local (I think?) Whisper1 model or REV AI. REV AI's API seems to be locked down but there is temporary storage involved. This shouldn't be too much of an issue since BatchALign2 is supported by the TAlkBank project.
 
+Excluded from Batch EVAL
+NEURAL-2 Other 
+UMD bilingual
+

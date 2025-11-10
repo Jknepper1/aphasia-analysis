@@ -12,11 +12,27 @@ import { stdin, stdout } from "node:process";
 let pcmChunks = [];
 let continueLoopFn;
 
-
-// MAIN RUNNING LOGIC *****************************************************************************************
 async function main() {
+
   // Establish interactive terminal element
   const rl = readline.createInterface({input: stdin, output: stdout})
+  // initial check
+  const normalCheck = fs.readdirSync("normal");
+  if (normalCheck.length != 0) { 
+    const ans = await rl.question("ERROR: Normal audio directory already contains files... would you like to wipe files and continue? [Y/n]\n")
+    if (ans == "Y" || ans == "y") {
+      // delete files in normal output directory
+      const dir = fs.readdirSync("normal");
+      for (let i = 0; i < dir.length; i++) {
+        fs.rmSync(`./normal/${dir[i]}`);
+      }
+    }
+    else {
+      console.log("Exiting script...")
+      process.exit(1);
+    }
+  }
+
   let outputDir;
   let prompt;
   let sentences;
@@ -33,20 +49,6 @@ async function main() {
         continue;
       }
   } 
-
-  while (true){
-    // Output dir is set here eventually by user input
-    const dir = await rl.question("Input your desired output directory in /aphasia-analysis/: ")
-    console.log(`The name of your output directory is: /aphasia-analysis/${dir}`)
-      try {
-        outputDir = fs.readdirSync(dir);
-        break;
-      }
-      catch (err){
-        console.log(`ERROR: ${dir} does not exist... try again \n`);
-        continue;
-      }
-  }
 
   while (true){
     // Converts text file into an array of sentences
@@ -70,6 +72,11 @@ async function main() {
         apiKey: process.env.OPENAI_API_KEY,
   });
 
+  // Conversion of input text to normal (non-aphasia) audio
+  await getAudio(sentences, openai, "normal");
+  
+  console.log("Sentences converted to normal audio.")
+
   // WebSocket Creation
   const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
   const ws = new WebSocket(url, {
@@ -83,11 +90,11 @@ async function main() {
   ws.on("message", handleEvent);
   ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
   ws.on("open", function open() {console.log("Connected to WebSocket server.")});
+  ws.on("error", (code) => console.log("There has been an error with OpenAI", code) ); // Catch some of the OpenAI error details here to print cleanly and then continue processing if possible
 
-  await getAudio(sentences, openai, outputDir);
-  console.log("Sentences converted to normal audio.")
-
+  console.log(outputDir.length)
   for (let i = 0; i < outputDir.length; i++) {
+    console.log(outputDir.length)
     const fullAudio = await decodeMp3(outputDir[i]); // Passing in full file name
     // decodes mp3 data, sends to socket and receives aphasia text
     const event = {
@@ -113,7 +120,6 @@ async function main() {
 
   // Converts aphasia .wavs into sentences and appends to a single file for NLP
   await aphasiaToText(openai);
-
   
   function handleEvent(data) {
     const serverEvent = JSON.parse(data);

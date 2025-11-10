@@ -2,13 +2,13 @@ import fs from "fs";
 import path from "path";
 
 // Initial TTS conversion for normal english sentences
-export async function getAudio(sentences, openai, outputDir) {
+export async function getAudio(sentences, openai, outputDirName) {
 
     for (let i = 0; i < sentences.length; i++) {
         console.log(`Processing sentence number ${i}`);
 
         // Unique file name with index
-        const speechFile = path.resolve(`./${outputDir}/speech${i}.mp3`);
+        const speechFile = path.resolve(`./${outputDirName}/speech${i}.mp3`);
 
         // The data passed to the openai speech model
         const mp3 = await openai.audio.speech.create({

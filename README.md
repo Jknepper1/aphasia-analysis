@@ -78,4 +78,3 @@ BatchAlign can be set up to utilize a local (I think?) Whisper1 model or REV AI.
 Excluded from Batch EVAL
 NEURAL-2 Other 
 UMD bilingual
-

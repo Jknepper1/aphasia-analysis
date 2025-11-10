@@ -16,5 +16,10 @@
   },
   "author": "Jackson Knepper",
   "license": "ISC",
-  "description": "An AI pipeline for producing replications of language disorder audio utilizing OpenAI's Realtime API and transcription models"
+  "description": "An AI pipeline for producing replications of language disorder audio utilizing OpenAI's Realtime API and transcription models",
+  "devDependencies": {
+    "@eslint/js": "^9.39.1",
+    "eslint": "^9.39.1",
+    "globals": "^16.5.0"
+  }
 }

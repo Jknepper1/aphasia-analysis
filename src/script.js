@@ -38,13 +38,13 @@ async function main() {
   let prompt;
   while (true){
     const file = await rl.question("Input the name of your aphasiafier prompt in /src/prompts/: ")
-    console.log(`The full path to the prompt is /src/prompts/${file}`)
       try {
         prompt = fs.readFileSync(`./src/prompts/${file}`, "utf8");
+        console.log(`The full path to the prompt is /src/prompts/${file}`)
         break;
       }
       catch (err){
-        console.log(`ERROR: ${file} does not exist... try again \n`);
+        console.log(err.message, "try again...");
         continue;
       }
   } 
@@ -53,13 +53,13 @@ async function main() {
   while (true){
     // Converts text file into an array of sentences
     const file = await rl.question("Input a set of sentences from /src/sentences/: ")
-    console.log(`The set of sentences to be aphasiafied is: /src/sentences/${file}`)
       try {
         sentences = fs.readFileSync(`./src/sentences/${file}`, "utf8").split(/\r?\n/) // <-- REGEX to catch \n for non-windows machines
+        console.log(`The set of sentences to be aphasiafied is: /src/sentences/${file}`)
         break;
       }
       catch (err){
-        console.log(`ERROR: ${file} does not exist... try again \n`);
+        console.log(err.message, "try again...");
         continue;
       }
   }
@@ -151,7 +151,7 @@ async function main() {
         writer.write(pcm);
         writer.end();
       } catch (err) {
-        console.log("WAV write failed:", err?.message || e);
+        console.log("WAV write failed:", err?.message || err);
       } finally { // Make sure to keep going even if a file failed
         if (continueLoopFn) {
           continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above

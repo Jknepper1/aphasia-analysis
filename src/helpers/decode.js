@@ -29,8 +29,8 @@ function base64EncodeAudio(float32Array) {
 
 export async function decodeMp3(f) {
   // console.log("mp3decode called")
-  console.log("Variable being passed to  decodeMp3: f");
-  const file = path.resolve(f)
+  // console.log(`Variable being passed to  decodeMp3: ${f}`);
+  const file = path.resolve("./normal", f)
   const audioFile = fs.readFileSync(file);
   const audioBuffer = await decodeAudio(audioFile);
   const channelData = audioBuffer.getChannelData(0);

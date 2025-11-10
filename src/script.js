@@ -13,18 +13,20 @@ let pcmChunks = [];
 let continueLoopFn;
 
 async function main() {
-
   // Establish interactive terminal element
   const rl = readline.createInterface({input: stdin, output: stdout})
   // initial check
   const normalCheck = fs.readdirSync("normal");
-  if (normalCheck.length != 0) { 
-    const ans = await rl.question("ERROR: Normal audio directory already contains files... would you like to wipe files and continue? [Y/n]\n")
+  const aphasiaCheck = fs.readdirSync("aphasia");
+  if (normalCheck.length != 0 || aphasiaCheck.length != 0) { 
+    const ans = await rl.question("ERROR: Normal audio and/or aphasia directories already contains files... would you like to wipe files and continue? [Y/n]\n")
     if (ans == "Y" || ans == "y") {
-      // delete files in normal output directory
-      const dir = fs.readdirSync("normal");
-      for (let i = 0; i < dir.length; i++) {
-        fs.rmSync(`./normal/${dir[i]}`);
+      // delete files in output directories
+      for (let i = 0; i < normalCheck.length; i++) {
+        fs.rmSync(`./normal/${normalCheck[i]}`);
+      }
+      for (let i = 0; i < aphasiaCheck.length; i++) {
+        fs.rmSync(`./aphasia/${aphasiaCheck[i]}`);
       }
     }
     else {
@@ -33,10 +35,7 @@ async function main() {
     }
   }
 
-  let outputDir;
   let prompt;
-  let sentences;
-
   while (true){
     const file = await rl.question("Input the name of your aphasiafier prompt in /src/prompts/: ")
     console.log(`The full path to the prompt is /src/prompts/${file}`)
@@ -50,6 +49,7 @@ async function main() {
       }
   } 
 
+  let sentences;
   while (true){
     // Converts text file into an array of sentences
     const file = await rl.question("Input a set of sentences from /src/sentences/: ")
@@ -66,6 +66,21 @@ async function main() {
 
   rl.close();
 
+  // WebSocket Creation - Done early to give time to create - NEEDS TO BE VERIFIED AND LOGGED TO ENSURE CREATION eventually
+  const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
+  const ws = new WebSocket(url, {
+    headers: {
+      "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
+      "OpenAI-Beta": "realtime=v1",
+    }
+  });
+  // WebSocket setting handlers
+  ws.on("message", handleEvent);
+  ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
+  ws.on("open", function open() {console.log("Connected to WebSocket server.")});
+  ws.on("error", (code) => console.log("There has been an error with OpenAI", code) ); // Catch some of the OpenAI error details here to print cleanly and then continue processing if possible
+
+
 
   // Initialized only once for speed
   const openai = new OpenAI({
@@ -76,26 +91,10 @@ async function main() {
   await getAudio(sentences, openai, "normal");
   
   console.log("Sentences converted to normal audio.")
+  const normalFiles = fs.readdirSync("normal");
 
-  // WebSocket Creation
-  const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
-  const ws = new WebSocket(url, {
-    headers: {
-      "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
-      "OpenAI-Beta": "realtime=v1",
-    }
-  });
-
-  // WebSocket setting handlers
-  ws.on("message", handleEvent);
-  ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
-  ws.on("open", function open() {console.log("Connected to WebSocket server.")});
-  ws.on("error", (code) => console.log("There has been an error with OpenAI", code) ); // Catch some of the OpenAI error details here to print cleanly and then continue processing if possible
-
-  console.log(outputDir.length)
-  for (let i = 0; i < outputDir.length; i++) {
-    console.log(outputDir.length)
-    const fullAudio = await decodeMp3(outputDir[i]); // Passing in full file name
+  for (let i = 0; i < normalFiles.length; i++) {
+    const fullAudio = await decodeMp3(normalFiles[i]); // Passing in full file name
     // decodes mp3 data, sends to socket and receives aphasia text
     const event = {
         type: "conversation.item.create",
@@ -117,10 +116,6 @@ async function main() {
     // continueLoopFn = resolve just makes the resolve function globally accessible so the handleEvent function can see it and execute it. It's like pausing the Promise and then handing the remote to the HandleEvent function
   }
 
-
-  // Converts aphasia .wavs into sentences and appends to a single file for NLP
-  await aphasiaToText(openai);
-  
   function handleEvent(data) {
     const serverEvent = JSON.parse(data);
 
@@ -132,6 +127,7 @@ async function main() {
           instructions: prompt // Prompt set by variable at top of file
         }
       }));
+      
     }
 
     if (serverEvent.type === "session.updated") {
@@ -144,22 +140,33 @@ async function main() {
     }
 
     if (serverEvent.type === "response.audio.done") {
-      const pcm = Buffer.concat(pcmChunks);
-      pcmChunks = [];
+      try  {
+        const pcm = Buffer.concat(pcmChunks);
+        pcmChunks = [];
 
-      const writer = new wav.FileWriter(
-        `./aphasia/processed-${Date.now()}.wav`,
-        { channels: 1, sampleRate: 24000, bitDepth: 16 }
-      );
-      writer.write(pcm);
-      writer.end(); // () => console.log("processed-XX.wav written")
-      
-      if (continueLoopFn) {
-        continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above
-        continueLoopFn = null;
+        const writer = new wav.FileWriter(
+          `./aphasia/processed-${Date.now()}.wav`,
+          { channels: 1, sampleRate: 24000, bitDepth: 16 }
+        );
+        writer.write(pcm);
+        writer.end();
+      } catch (err) {
+        console.log("WAV write failed:", err?.message || e);
+      } finally { // Make sure to keep going even if a file failed
+        if (continueLoopFn) {
+          continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above
+          continueLoopFn = null;
+        }
       }
     }
   }
+
+  // Converts aphasia .wavs into sentences and appends to a single file for NLP
+  console.log("Converting aphasia audio to text...")
+  await aphasiaToText(openai);
+  console.log("Completed. Script exiting")
+  process.exit(0)
+
 }
 
 // Init 

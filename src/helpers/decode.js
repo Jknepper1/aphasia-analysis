@@ -27,10 +27,10 @@ function base64EncodeAudio(float32Array) {
   return btoa(binary);
 }
 
-export async function decodeMp3(fileNum) {
+export async function decodeMp3(f) {
   // console.log("mp3decode called")
-  const file = path.resolve(`./output/speech${fileNum}.mp3`)
-  const audioFile = fs.readFileSync(file);
+  const file = path.resolve(f)
+  const audioFile = fs.readFileSync(f);
   const audioBuffer = await decodeAudio(audioFile);
   const channelData = audioBuffer.getChannelData(0);
   const fullAudio = base64EncodeAudio(channelData);

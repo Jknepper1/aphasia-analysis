@@ -21,41 +21,46 @@ async function main() {
   let prompt;
   let sentences;
 
-
   while (true){
     const file = await rl.question("Input the name of your aphasiafier prompt in /src/prompts/: ")
     console.log(`The full path to the prompt is /src/prompts/${file}`)
-    const ans1 = await rl.question("Is that correct? [Y/n] ")
-    if (ans1 == "Y" || ans1 == "y") {
-      prompt = fs.readFileSync(`./src/prompts/${file}`, "utf8")
-      console.log(prompt)
-      break;
-    }
+      try {
+        prompt = fs.readFileSync(`./src/prompts/${file}`, "utf8");
+        break;
+      }
+      catch (err){
+        console.log(`ERROR: ${file} does not exist... try again \n`);
+        continue;
+      }
   } 
 
   while (true){
     // Output dir is set here eventually by user input
-    outputDir = await rl.question("Input your desired output directory in /aphasia-analysis/: ")
-    console.log(`The name of your output directory is: /aphasia-analysis/${outputDir}`)
-    const ans2 = await rl.question("Is that correct? [Y/n] ")
-    if (ans2 == "Y" || ans2 == "y") {
-      break;
-    }
+    const dir = await rl.question("Input your desired output directory in /aphasia-analysis/: ")
+    console.log(`The name of your output directory is: /aphasia-analysis/${dir}`)
+      try {
+        outputDir = fs.readdirSync(dir);
+        break;
+      }
+      catch (err){
+        console.log(`ERROR: ${dir} does not exist... try again \n`);
+        continue;
+      }
   }
 
   while (true){
     // Converts text file into an array of sentences
     const file = await rl.question("Input a set of sentences from /src/sentences/: ")
     console.log(`The set of sentences to be aphasiafied is: /src/sentences/${file}`)
-    const ans3 = await rl.question("Is that correct? [Y/n] ")
-    if (ans3 == "Y" || ans3 == "y") {
-      sentences = fs.readFileSync(`./src/sentences/${file}`, "utf8").split(/\r?\n/) // <-- REGEX to catch \n for non-windows machines
-      console.log(sentences);
-      break;
-    }
+      try {
+        sentences = fs.readFileSync(`./src/sentences/${file}`, "utf8").split(/\r?\n/) // <-- REGEX to catch \n for non-windows machines
+        break;
+      }
+      catch (err){
+        console.log(`ERROR: ${file} does not exist... try again \n`);
+        continue;
+      }
   }
-
-  
 
   rl.close();
 
@@ -82,13 +87,8 @@ async function main() {
   await getAudio(sentences, openai, outputDir);
   console.log("Sentences converted to normal audio.")
 
-  // Get the amount of files in the /output directory
-  const files = fs.readdirSync("./output");
-  const fileNum = files.length;
-  console.log("Number of files to decode", fileNum);
-
-  for(let i = 0; i < fileNum; i++) {
-    const fullAudio = await decodeMp3(i);
+  for (let i = 0; i < outputDir.length; i++) {
+    const fullAudio = await decodeMp3(outputDir[i]); // Passing in full file name
     // decodes mp3 data, sends to socket and receives aphasia text
     const event = {
         type: "conversation.item.create",

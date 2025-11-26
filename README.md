@@ -46,6 +46,10 @@ For more information on the results of the EVAL command go to section 8.5.1 in [
 
 #### **Using BatchAlign2**
 
+Below are my personal notes and observations, but this link takes you to the developer's usage guide:
+
+https://talkbank.org/0info/BA2-usage.pdf
+
 It looks like the Word Error Rate (WER) when BatchAlign2 is used to generate a CHAT transcript from audio is very dependent on the quality of the recordings going into the system. It can vary from 1% to 20% when **REV-AI ** is used according to [this](https://journals.sagepub.com/doi/full/10.1177/09637214241304345#core-bibr14-09637214241304345-1) study, which used BatchALign2's built in benchmarking feature to test varying audio conditions on two-party iterviews and TED speeches.
 
 BatchAlign2 can also analyze CHAT transcripts for morphosyntactic structure. This is extremely accurate in english according to the same study above.
@@ -75,6 +79,17 @@ There are some caveats though such as
 
 BatchAlign can be set up to utilize a local (I think?) Whisper1 model or REV AI. REV AI's API seems to be locked down but there is temporary storage involved. This shouldn't be too much of an issue since BatchALign2 is supported by the TAlkBank project.
 
-Excluded from Batch EVAL
+##### Excluded from Batch EVAL
 NEURAL-2 Other 
 UMD bilingual
+
+
+#### BatchAlign Process
+
+AS of now one needs to do the following to run BatchAlign2
+0. Run `batchalign setup` and add your RevAI API key
+1. Add all .wav files to the input folder
+2. Run `batchalign transcribe input output`
+3. Run `batchalign morph output morph`
+    You now have ASR based transcripts with morph tags in morph
+4. Utililze CLAN to get NLP metrics in a spreadsheet

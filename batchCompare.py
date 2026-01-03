@@ -51,6 +51,7 @@ print("Do Files line up?", (batch_common["File"].values == human_common["File"].
 
 # Following loop assumes that the rows for each sheet match up with each other
 # This honestly may not be true but is reasonable to assume with my use of sets and sorting
+corrs = {}
 for column in column_names:
     print("\nAnalyzing Column:", column)
     plt.figure()
@@ -64,9 +65,10 @@ for column in column_names:
     print("Y Cord Num:", len(y_cords))
 
     # Produce a Pearson correlation coefficient
+    
     corr_matrix = np.corrcoef(x_cords, y_cords)
     r = corr_matrix[0, 1].round(5)
-    print(f'Correlation of {column}:', r)
+    corrs[column] = r
 
 
     # Determine the min and max values for setting plot limits 
@@ -89,4 +91,9 @@ for column in column_names:
 
     plt.xlim(min_val, max_val)
     plt.ylim(min_val, max_val)
+
+# Print all correlations in one list to share with team
+print("Correlations:")
+for x in corrs: print(f' {x} = {corrs[x]}')
+
 plt.show()

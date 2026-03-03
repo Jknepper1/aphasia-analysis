@@ -1,25 +1,61 @@
 import "dotenv/config";
 import fs from "fs"; // Could be cut
+import path from "path";  
 import { getAudio } from "./helpers/tts.js"
 import { aphasiaToText } from "./helpers/transcribe.js";
 import { decodeMp3 } from "./helpers/decode.js";
 import OpenAI from "openai";
 import WebSocket from "ws";
-import wav from "wav";
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from "node:process";
+import { write } from "node:fs";
 
-let pcmChunks = [];
-let continueLoopFn;
+
+let point = 0; // 0 means start at beginning, 1 means start at normal to aphasia, 2 means start at transcription. Set by user input in main()
 
 async function main() {
+  let currentResolve = null;
+  let currentChunks = [];
+  function writeWav(filePath, pcmBuffer, sampleRate = 24000) {
+    const numChannels = 1;
+    const bitsPerSample = 16;
+    const byteRate = sampleRate * numChannels * bitsPerSample / 8;
+    const blockAlign = numChannels * bitsPerSample / 8;
+    const dataSize = pcmBuffer.length;
+    const buffer = Buffer.alloc(44 + dataSize);
+
+    buffer.write("RIFF", 0);
+    buffer.writeUInt32LE(36 + dataSize, 4);
+    buffer.write("WAVE", 8);
+    buffer.write("fmt ", 12);
+    buffer.writeUInt32LE(16, 16); // PCM header size
+    buffer.writeUInt16LE(1, 20);  // PCM format
+    buffer.writeUInt16LE(numChannels, 22);
+    buffer.writeUInt32LE(sampleRate, 24);
+    buffer.writeUInt32LE(byteRate, 28);
+    buffer.writeUInt16LE(blockAlign, 32);
+    buffer.writeUInt16LE(bitsPerSample, 34);
+    buffer.write("data", 36);
+    buffer.writeUInt32LE(dataSize, 40);
+
+    pcmBuffer.copy(buffer, 44);
+
+    fs.writeFileSync(filePath, buffer);
+  }
+
   // Establish interactive terminal element
   const rl = readline.createInterface({input: stdin, output: stdout})
+  
   // initial check
+  if (!fs.existsSync("normal")) fs.mkdirSync("normal");
+  if (!fs.existsSync("aphasia")) fs.mkdirSync("aphasia");
+
   const normalCheck = fs.readdirSync("normal");
   const aphasiaCheck = fs.readdirSync("aphasia");
+
+  // Now it is safe to read them
   if (normalCheck.length != 0 || aphasiaCheck.length != 0) { 
-    const ans = await rl.question("ERROR: Normal audio and/or aphasia directories already contains files... would you like to wipe files and continue? [Y/n]\n")
+    const ans = await rl.question("ERROR: Normal audio and/or aphasia directories already contains files... would you like to wipe files? [Y/n]\n")
     if (ans == "Y" || ans == "y") {
       // delete files in output directories
       for (let i = 0; i < normalCheck.length; i++) {
@@ -29,12 +65,10 @@ async function main() {
         fs.rmSync(`./aphasia/${aphasiaCheck[i]}`);
       }
     }
-    else {
-      console.log("Exiting script...")
-      process.exit(1);
-    }
   }
 
+  point = await rl.question("Where would you like to start? [0: Beginning, 1: NormalToAphasia, 2: Transcription]\n")
+  
   let prompt;
   while (true){
     const file = await rl.question("Input the name of your aphasiafier prompt in /src/prompts/: ")
@@ -74,88 +108,96 @@ async function main() {
       "OpenAI-Beta": "realtime=v1",
     }
   });
-  // WebSocket setting handlers
-  ws.on("message", handleEvent);
-  ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
-  ws.on("open", function open() {console.log("Connected to WebSocket server.")});
-  ws.on("error", (code) => console.log("There has been an error with OpenAI", code) ); // Catch some of the OpenAI error details here to print cleanly and then continue processing if possible
-
-
-
   // Initialized only once for speed
   const openai = new OpenAI({
         apiKey: process.env.OPENAI_API_KEY,
   });
 
+  if (point == "0") { 
+  // Skipped if the user selects start at NormalToAphasia or transcription
   // Conversion of input text to normal (non-aphasia) audio
   await getAudio(sentences, openai, "normal");
   
   console.log("Sentences converted to normal audio.")
-  const normalFiles = fs.readdirSync("normal");
-
-  for (let i = 0; i < normalFiles.length; i++) {
-    const fullAudio = await decodeMp3(normalFiles[i]); // Passing in full file name
-    // decodes mp3 data, sends to socket and receives aphasia text
-    const event = {
-        type: "conversation.item.create",
-        item: {
-            type: "message",
-            role: "user",
-            content: [
-                {
-                    type: "input_audio",
-                    audio: fullAudio,
-                },
-            ],
-        },
-    };
-    console.log(`sentence ${i}`)
-    ws.send(JSON.stringify(event));
-    ws.send(JSON.stringify({ type: "response.create"})) // This should trigger the building of a response object based upon the last message sent
-    await new Promise((resolve) => {continueLoopFn = resolve}) // Maintains consistent pacing with API messages by awaiting response.audio.done handler 
-    // continueLoopFn = resolve just makes the resolve function globally accessible so the handleEvent function can see it and execute it. It's like pausing the Promise and then handing the remote to the HandleEvent function
+  // Decodes normal audio, sends to socket, receives aphasia audio, writes aphasia audio to file, converts aphasia audio to text
   }
 
-  function handleEvent(data) {
-    const serverEvent = JSON.parse(data);
+  if (point == "1" || point == "0") {
+    // WebSocket setting handlers
+    ws.on("message", handleEvent);
+    ws.on("close", (code, reason) => {console.warn("WS closed:", code, reason?.toString())});
+    ws.on("error", (code) => console.log("There has been an error with OpenAI", code) ); // Catch some of the OpenAI error details here to print cleanly and then continue processing if possible
 
-    if (serverEvent.type === "session.created") {
-      console.log("API session created.");
+    // Ensures the WebSocket is open before continuing the script
+    await new Promise((resolve) => {
+      ws.on("open", () => {
+        console.log("Connected to WebSocket server.");
+        resolve(); 
+      });
+    });
+
+    const normalFiles = fs.readdirSync("normal");
+    for (let i = 0; i < normalFiles.length; i++) {
+      const fullAudio = await decodeMp3(normalFiles[i]);
+
+      console.log(`sentence ${i}`);
+
+      const waitPromise = new Promise((resolve) => {
+        currentResolve = resolve;
+      });
+
       ws.send(JSON.stringify({
-        type: "session.update",
-        session: {
-          instructions: prompt // Prompt set by variable at top of file
+        type: "conversation.item.create",
+        item: {
+          type: "message",
+          role: "user",
+          content: [{ type: "input_audio", audio: fullAudio }]
         }
       }));
-      
+
+      ws.send(JSON.stringify({ type: "response.create" }));
+
+      await waitPromise;
     }
 
-    if (serverEvent.type === "session.updated") {
-      console.log("Prompt set in API session.")
-    }
+    function handleEvent(data) {
+      const serverEvent = JSON.parse(data);
 
-    if (serverEvent.type === "response.audio.delta") {
-      // Access Base64-encoded audio chunks
-      pcmChunks.push(Buffer.from(serverEvent.delta, "base64"))
-    }
+      if (serverEvent.type === "session.created") {
+        console.log("API session created.");
+        ws.send(JSON.stringify({
+          type: "session.update",
+          session: {
+            instructions: prompt // Prompt set by variable by global var
+          }
+        }));
+        
+      }
 
-    if (serverEvent.type === "response.audio.done") {
-      try  {
-        const pcm = Buffer.concat(pcmChunks);
-        pcmChunks = [];
+      if (serverEvent.type === "session.updated") {
+        console.log("Prompt set in API session.")
+      }
 
-        const writer = new wav.FileWriter(
-          `./aphasia/processed-${Date.now()}.wav`,
-          { channels: 1, sampleRate: 24000, bitDepth: 16 }
-        );
-        writer.write(pcm);
-        writer.end();
-      } catch (err) {
-        console.log("WAV write failed:", err?.message || err);
-      } finally { // Make sure to keep going even if a file failed
-        if (continueLoopFn) {
-          continueLoopFn(); // Starts as a variable, but is assigned to the resolve function of the Promise instance in the for loop above
-          continueLoopFn = null;
+      if (serverEvent.type === "response.audio.delta") {
+        // Access Base64-encoded audio chunks
+        currentChunks.push(Buffer.from(serverEvent.delta, "base64"))
+      }
+
+      if (serverEvent.type === "response.audio.done") {
+        const pcm = Buffer.concat(currentChunks);
+        currentChunks = [];
+
+
+        const aphasiaDir = path.resolve("./aphasia");
+        fs.mkdirSync(aphasiaDir, { recursive: true });
+        const filePath = path.join(aphasiaDir,  `/processed-${Date.now()}.wav`)
+        console.log("Does aphasia exist:", fs.existsSync(aphasiaDir));
+        
+        writeWav(filePath, pcm);
+        
+        if (currentResolve) {
+          currentResolve();
+          currentResolve = null;
         }
       }
     }
@@ -165,8 +207,6 @@ async function main() {
   console.log("Converting aphasia audio to text...")
   await aphasiaToText(openai);
   console.log("Completed. Script exiting")
-  process.exit(0)
-
 }
 
 // Init 

@@ -6,6 +6,15 @@ export async function getAudio(sentences, openai, outputDirName) {
 
     for (let i = 0; i < sentences.length; i++) {
         console.log(`Processing sentence number ${i}`);
+        
+        // Trim any invisible whitespace or carriage returns
+        const cleanSentence = sentences[i].trim();
+    
+        // 2. THE FIX: If the string is empty after trimming, skip it
+        if (!cleanSentence) {
+            console.log("Skipping empty line...");
+            continue; 
+        }
 
         // Unique file name with index
         const speechFile = path.resolve(`./${outputDirName}/speech${i}.mp3`);
@@ -14,7 +23,7 @@ export async function getAudio(sentences, openai, outputDirName) {
         const mp3 = await openai.audio.speech.create({
             model: "gpt-4o-mini-tts",
             voice: "alloy",
-            input: sentences[i],
+            input: cleanSentence,
             instructions: "Speak in a normal tone.",
         });
 

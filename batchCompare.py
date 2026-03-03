@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+import scipy.stats
 import matplotlib.pyplot as plt
 
 batch = pd.read_csv("Batch.csv")
@@ -20,6 +21,10 @@ human["File"] = human["File"].str.strip()
 # Dropping duplicates based on the File column, keeping only the first occurrence
 # Assumes which is kept doesn't matter
 # Due to the low amount of duplicates over such a large sample size this may not be an issue
+dup_files = batch["File"][batch["File"].duplicated()]
+print("Duplicate Files in Batch Dataset:", len(dup_files))
+
+
 batch_1 = batch.drop_duplicates(subset=["File"], keep="first")
 human_1 = human.drop_duplicates(subset=["File"], keep="first")
 
@@ -27,7 +32,7 @@ human_1 = human.drop_duplicates(subset=["File"], keep="first")
 # Removes duplicates and only holds files that are in both datasets
 common_files = set(batch_1["File"]) & set(human_1["File"])
 
-print("Expected X and Y amount:", len(common_files))
+print("Maximum X and Y amount:", len(common_files))
 
 batch_common = batch_1[batch_1["File"].isin(common_files)]
 human_common = human_1[human_1["File"].isin(common_files)]
@@ -51,15 +56,18 @@ print("Do Files line up?", (batch_common["File"].values == human_common["File"].
 
 # Following loop assumes that the rows for each sheet match up with each other
 # This honestly may not be true but is reasonable to assume with my use of sets and sorting
-corrs = {}
+pearson = {}
+spearman = {}
 for column in column_names:
     print("\nAnalyzing Column:", column)
     plt.figure()
-    x_cords = []
-    y_cords = []
-    for i in range(len(batch_common)):
-        x_cords.append(batch_common.iloc[i][column])
-        y_cords.append(human_common.iloc[i][column])
+    x = batch_common[column].to_numpy()
+    y = human_common[column].to_numpy()
+
+    # Remove NaN values from both x and y, a NaN value in one removes that index for both
+    mask = np.isfinite(x) & np.isfinite(y)
+    x_cords = x[mask]
+    y_cords = y[mask]
 
     print("X Cord Num:", len(x_cords))
     print("Y Cord Num:", len(y_cords))
@@ -67,8 +75,12 @@ for column in column_names:
     # Produce a Pearson correlation coefficient
     
     corr_matrix = np.corrcoef(x_cords, y_cords)
-    r = corr_matrix[0, 1].round(5)
-    corrs[column] = r
+    r = corr_matrix[0, 1]
+    pearson[column] = r
+
+    # Produce Spearman correlation (prevents outliers from making as much change)
+    rho = scipy.stats.spearmanr(x_cords, y_cords)
+    spearman[column] = rho.correlation
 
 
     # Determine the min and max values for setting plot limits 
@@ -91,9 +103,11 @@ for column in column_names:
 
     plt.xlim(min_val, max_val)
     plt.ylim(min_val, max_val)
+    plt.savefig(f'graphs/{column}.png')
 
 # Print all correlations in one list to share with team
-print("Correlations:")
-for x in corrs: print(f' {x} = {corrs[x]}')
-
+print("\nCorrelations:")
+for x in pearson:
+    print(f'{x}: r = {format(pearson[x], ".4f")}, rho = {format(spearman[x], ".4f")}')
+    
 plt.show()

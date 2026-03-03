@@ -2,11 +2,13 @@
 .venv
 /node_modules/
 /dist/
-/normal/
+/normal/*
 /.vscode/
-/aphasia
+/aphasia/*
 *.cha
 *.xls
 *.cex
 /talkbank*
 cheatsheet.doc
+/graphs/*
+/final/*

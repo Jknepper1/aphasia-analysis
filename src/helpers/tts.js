@@ -8,7 +8,14 @@ export async function getAudio(sentences, openai, outputDirName) {
         console.log(`Processing sentence number ${i}`);
         
         // Trim any invisible whitespace or carriage returns
-        const cleanSentence = sentences[i].trim();
+        let cleanSentence = sentences[i].trim();
+
+        // Clear filename from front delimit at :
+        const filenameDelimiterIndex = cleanSentence.indexOf(":");
+        if (filenameDelimiterIndex !== -1) {
+            cleanSentence = cleanSentence.substring(filenameDelimiterIndex + 2).trim();
+        }
+        console.log(`Cleaned sentence: "${cleanSentence}"`);
     
         // 2. THE FIX: If the string is empty after trimming, skip it
         if (!cleanSentence) {

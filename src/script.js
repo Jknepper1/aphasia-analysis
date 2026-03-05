@@ -101,6 +101,7 @@ async function main() {
   rl.close();
 
   // WebSocket Creation - Done early to give time to create - NEEDS TO BE VERIFIED AND LOGGED TO ENSURE CREATION eventually
+  // POTENTIALLY UPDATE TO NEWER MODEL, Should be roughly 20% more cost effective 
   const url = "wss://api.openai.com/v1/realtime?model=gpt-4o-realtime-preview-2024-12-17";
   const ws = new WebSocket(url, {
     headers: {
@@ -207,6 +208,7 @@ async function main() {
   console.log("Converting aphasia audio to text...")
   await aphasiaToText(openai);
   console.log("Completed. Script exiting")
+  process.exit();
 }
 
 // Init 

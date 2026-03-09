@@ -1,48 +1,15 @@
 import "dotenv/config";
-import fs from "fs"; // Could be cut
+import fs from "fs";
 import path from "path";  
 import { getAudio } from "./helpers/tts.js"
 import { aphasiaToText } from "./helpers/transcribe.js";
-import { decodeMp3 } from "./helpers/decode.js";
+import { decodeMp3, writeWav } from "./helpers/decode.js";
 import OpenAI from "openai";
 import WebSocket from "ws";
 import * as readline from 'node:readline/promises';
 import { stdin, stdout } from "node:process";
-import { write } from "node:fs";
 
-
-let point = 0; // 0 means start at beginning, 1 means start at normal to aphasia, 2 means start at transcription. Set by user input in main()
-
-async function main() {
-  let currentResolve = null;
-  let currentChunks = [];
-  function writeWav(filePath, pcmBuffer, sampleRate = 24000) {
-    const numChannels = 1;
-    const bitsPerSample = 16;
-    const byteRate = sampleRate * numChannels * bitsPerSample / 8;
-    const blockAlign = numChannels * bitsPerSample / 8;
-    const dataSize = pcmBuffer.length;
-    const buffer = Buffer.alloc(44 + dataSize);
-
-    buffer.write("RIFF", 0);
-    buffer.writeUInt32LE(36 + dataSize, 4);
-    buffer.write("WAVE", 8);
-    buffer.write("fmt ", 12);
-    buffer.writeUInt32LE(16, 16); // PCM header size
-    buffer.writeUInt16LE(1, 20);  // PCM format
-    buffer.writeUInt16LE(numChannels, 22);
-    buffer.writeUInt32LE(sampleRate, 24);
-    buffer.writeUInt32LE(byteRate, 28);
-    buffer.writeUInt16LE(blockAlign, 32);
-    buffer.writeUInt16LE(bitsPerSample, 34);
-    buffer.write("data", 36);
-    buffer.writeUInt32LE(dataSize, 40);
-
-    pcmBuffer.copy(buffer, 44);
-
-    fs.writeFileSync(filePath, buffer);
-  }
-
+async function setup() {
   // Establish interactive terminal element
   const rl = readline.createInterface({input: stdin, output: stdout})
   
@@ -67,7 +34,7 @@ async function main() {
     }
   }
 
-  point = await rl.question("Where would you like to start? [0: Beginning, 1: NormalToAphasia, 2: Transcription]\n")
+  const point = await rl.question("Where would you like to start? [0: Beginning, 1: NormalToAphasia, 2: Transcription]\n")
   
   let prompt;
   while (true){
@@ -98,7 +65,23 @@ async function main() {
       }
   }
 
+  const normalDir = await rl.question("Input the name of your normal audio directory in /normal/: ")
+  const aphasiaDir = await rl.question("Input the name of your aphasia audio directory in /aphasia/: ")
+
   rl.close();
+  
+  return { point, prompt, sentences, normalDir, aphasiaDir }; // 0 means start at beginning, 1 means start at normal to aphasia, 2 means start at transcription. Set by user input in main()
+}
+
+
+
+async function main() {
+  let currentResolve = null;
+  let currentChunks = [];
+
+  // Get all vars from setup() and then destructure for use
+  let { point, prompt, sentences, normalDir, aphasiaDir } = await setup();
+  
 
   // WebSocket Creation - Done early to give time to create - NEEDS TO BE VERIFIED AND LOGGED TO ENSURE CREATION eventually
   // POTENTIALLY UPDATE TO NEWER MODEL, Should be roughly 20% more cost effective 
@@ -106,7 +89,7 @@ async function main() {
   const ws = new WebSocket(url, {
     headers: {
       "Authorization": "Bearer " + process.env.OPENAI_API_KEY,
-      "OpenAI-Beta": "realtime=v1",
+      "OpenAI-Beta": "realtime=v1", // This has to be removed for the newer model
     }
   });
   // Initialized only once for speed
@@ -116,8 +99,9 @@ async function main() {
 
   if (point == "0") { 
   // Skipped if the user selects start at NormalToAphasia or transcription
+  
   // Conversion of input text to normal (non-aphasia) audio
-  await getAudio(sentences, openai, "normal");
+  await getAudio(sentences, openai, normalDir);
   
   console.log("Sentences converted to normal audio.")
   // Decodes normal audio, sends to socket, receives aphasia audio, writes aphasia audio to file, converts aphasia audio to text
@@ -206,7 +190,7 @@ async function main() {
 
   // Converts aphasia .wavs into sentences and appends to a single file for NLP
   console.log("Converting aphasia audio to text...")
-  await aphasiaToText(openai);
+  await aphasiaToText(openai, aphasiaDir);
   console.log("Completed. Script exiting")
   process.exit();
 }

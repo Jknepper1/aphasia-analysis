@@ -1,12 +1,12 @@
 import fs from "fs";
 
 // Takes aphasia audio and converts to text
-export async function aphasiaToText(openai) {
+export async function aphasiaToText(openai, dir) {
   const files = fs.readdirSync("./aphasia");
   let i = 0;
   for (const file of files) {
     const transcription = await openai.audio.transcriptions.create({
-    file: fs.createReadStream("./aphasia/" + file),
+    file: fs.createReadStream(`./aphasia/${dir}` + file),
     model: "gpt-4o-transcribe"
     })
 

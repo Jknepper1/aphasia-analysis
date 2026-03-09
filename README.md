@@ -103,3 +103,15 @@ AS of now one needs to do the following to run BatchAlign2
 `+d` tells CLAN to maintain acceptable CLAN format
 
 `+t*` is where you specify speaker tier. If this breaks, just use the UI to EXCLUDE the INV tier instead of including the PAR tier
+
+### TODO
+
+I honestly might re write this entire pipeline in Python. It will take me a LONG time to do so so today is not the day.
+Issues:
+- The NodeJS script is hard to understand and work with in general and the WAV libray sucked so I literaly had to write the file header myself.
+- I am unsure about how good the websocket logic is and it may just be easier to implement in python
+
+Changes that need to happen with the script anyways:
+- The whole batchalign issue is horrible. I can't run my .txt files through any kind of morphology or EVAL without catastropic errors and skewed data
+- The single sentence format doesn't seem to work very well, as in NLP aspects like MLU anything will be skewed unless the transcript is a cohesive section of sentences such as the entire @cinderella section
+- Randomized sentence structure may be ineffective due to lack of MLU metrics 

@@ -24,7 +24,7 @@ export async function getAudio(sentences, openai, outputDirName) {
         }
 
         // Unique file name with index
-        const speechFile = path.resolve(`./${outputDirName}/speech${i}.mp3`);
+        const speechFile = path.resolve(`./normal/${outputDirName}/speech${i}.mp3`);
 
         // The data passed to the openai speech model
         const mp3 = await openai.audio.speech.create({

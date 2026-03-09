@@ -13,3 +13,4 @@ cheatsheet.doc
 /normal/*
 /aphasia/*
 /src/transcripts/*
+__pycache__

@@ -2,9 +2,7 @@
 .venv
 /node_modules/
 /dist/
-/normal/*
 /.vscode/
-/aphasia/*
 *.cha
 *.xls
 *.cex
@@ -12,3 +10,6 @@
 cheatsheet.doc
 /graphs/*
 /final/*
+/normal/*
+/aphasia/*
+/src/transcripts/*

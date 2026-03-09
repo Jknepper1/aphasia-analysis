@@ -5,7 +5,7 @@ import path from "path";
 export async function getAudio(sentences, openai, outputDirName) {
 
     for (let i = 0; i < sentences.length; i++) {
-        console.log(`Processing sentence number ${i}`);
+        console.log(`Processing transcript number ${i}`);
         
         // Trim any invisible whitespace or carriage returns
         let cleanSentence = sentences[i].trim();

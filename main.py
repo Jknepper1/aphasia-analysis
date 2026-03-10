@@ -141,7 +141,7 @@ async def main():
     
     if point == "0" or point == "1" or point == "2":
         print("BatchAlign Transcription Beginning...")
-        await transcribe_morphotag(aphasia_dir, final_dir)
+        transcribe_morphotag(aphasia_dir, final_dir)
         print("BatchAlign Transcription Ending...")
 
 

@@ -12,9 +12,6 @@ def transcribe_morphotag(aphasia_dir_name, output_dir_name):
     output_dir = os.path.join(output_dir_name)
     # os.makedirs(output_dir, exist_ok=True)
     
-    # Initialize the Batchalign pipeline
-    # revai based asr followed by morphosyntax 
-    
     files = [f for f in os.listdir(input_dir) if f.endswith(".wav")]
     
     if not files:

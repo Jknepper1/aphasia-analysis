@@ -4,18 +4,15 @@
 This is a project that takes text, turns it into audio, then utilizes OpenAIs' Realtime AI to producs audio and a transcript of the text as if spoken by someone with Aphasia. The ultimate goal of this project is to be used as a way to quickly test different prompts and eventually OpenAI realtime models for linguistic based accuracy to real people with various types of Aphasia. There could be great value to the world of sppech therapy in understanding how well AI can replicate PWAs as well as understand what their intended meaning and words are. This project is intended to build upon the Aphasiafier project by the BYU CS PCCL.
 
 ### How the script works
-1. Reads in a text prompt from /prompts
-2. Takes a list of sentences from /sentences
-    1. Calls TTS with a normal tone fore each sentence (Each input must be separated by a newline w/ no trailing newline at the end of the file)
-    2. Saves the result to an mp3 in /output
-3. Helper functions prepare audio to be processed by Realtime API
-4. Sends audio to Realtime API through WebSocket connection
-    1. Responses are saved as .wav files in /aphasia
-5. Converts Aphasia audio from Realtime API back to text **(This will replaced with BatchALign2 conversion straight to CHAT)**
-    1. Calls STT model from OpenAI for each .wav file
-    2. First line overwrites then the file is appended to
+1. Reads in all files from a folder in /transcripts
+2. Utilizes tts.py to convert all files into audio files
+    1. These are stored under `/normal/<specified_folder>`
+3. Audio files in /normal are sent through OpenAI Realtime w/ specified prompt in /prompts
+    1. The results sre stored under /aphasia
+4. The files in /aphasia/<folder_name> are then run through BatchAlign2 Transcription + Morphology
+    1. The results are stored in /final as .cha transcripts. *Eval commands can be run on these files*
 
-You can input sentence sets, aphasia prompts, and specify an output directory 
+The reason for the complexity is due to our need to replicate specific research parameters. You will notice that a new websocket connection is opened per file when converting from normal to aphasia simulated audio. This is to remove the context window entirely as each file MUST be treated as a separate entity to simulate the indivudual nature of the human interviews in TalkBank. It is also vital to send audio rather than text through the Realtime API to simulate the actual usage of the aphasiafier tool which requires audio input.
 
 ## Approach to Using CLAN
 
@@ -26,12 +23,7 @@ Reference this book for guidance (start on page, #...)
 
 You will need to process a basic text file of input sentences a few times to get the right output. The CLAN software expects a specific type of file called a .cha file. There are specific headers for this file type that need to be used in order for the software to process it correctly. Reference the CLAN book [here](www.google.com). There is a system developed by the AphasiaBank organization referred to as CHAT that defines the syntax for their transcript files [here](www.google.com) as well. This is the syntax you could use to markup punctuation and pauses for example in someone's Aphasia speech. That won't be necessary for this script but could be valuable in the future
 
-### From Input to Output
-Input: .txt file of sentences (see the example set1.txt)
-Aphasia.txt - After running the script you will have your aphasiafied sentences in a .txt file
-CLAN formatting: The easiest way to convert your .txt file to a .cha file is by using ReGex to add *PAR to the beginning of each line. You can also use AI. GPT-5 Does well. It is important to familarize yourself with the CLAN format so that you can confirm your file is set up properly in this step should you choose to use AI 
-
-#### **Using CLAN**
+#### Using CLAN
 
 First, command CLAN to run morphology on your aphasia text in order to provide more holistic and accurate linguistic measurements.
 The command should look similar to `mor  @ +t*PAR` if you use the GUI interface to build the command (recommended)
@@ -53,14 +45,6 @@ https://talkbank.org/0info/BA2-usage.pdf
 It looks like the Word Error Rate (WER) when BatchAlign2 is used to generate a CHAT transcript from audio is very dependent on the quality of the recordings going into the system. It can vary from 1% to 20% when **REV-AI ** is used according to [this](https://journals.sagepub.com/doi/full/10.1177/09637214241304345#core-bibr14-09637214241304345-1) study, which used BatchALign2's built in benchmarking feature to test varying audio conditions on two-party interviews and TED speeches.
 
 BatchAlign2 can also analyze CHAT transcripts for morphosyntactic structure. This is extremely accurate in english according to the same study above.
-
-##### What is the difference between a batchalign2 analysis and a CLAN mor -> eval pipeline?
-
-BatchAlign2 + Stanza: Good for initial processing (turning audio → transcript → UD parse). Fast, modern, and multilingual.
-
-CLAN mor + eval: Good for standardized analysis in CHAT/TalkBank corpora. This is what gives you continuity with decades of prior research and published norms.
-
-So in practice, many researchers use BatchAlign2 for transcription/segmentation/alignment, then still run mor and eval in CLAN to get the standardized %mor tier and developmental profiles that can be compared across studies.
 
 ## Talk Bank & API Privacy
 
@@ -103,15 +87,3 @@ AS of now one needs to do the following to run BatchAlign2
 `+d` tells CLAN to maintain acceptable CLAN format
 
 `+t*` is where you specify speaker tier. If this breaks, just use the UI to EXCLUDE the INV tier instead of including the PAR tier
-
-### TODO
-
-I honestly might re write this entire pipeline in Python. It will take me a LONG time to do so so today is not the day.
-Issues:
-- The NodeJS script is hard to understand and work with in general and the WAV libray sucked so I literaly had to write the file header myself.
-- I am unsure about how good the websocket logic is and it may just be easier to implement in python
-
-Changes that need to happen with the script anyways:
-- The whole batchalign issue is horrible. I can't run my .txt files through any kind of morphology or EVAL without catastropic errors and skewed data
-- The single sentence format doesn't seem to work very well, as in NLP aspects like MLU anything will be skewed unless the transcript is a cohesive section of sentences such as the entire @cinderella section
-- Randomized sentence structure may be ineffective due to lack of MLU metrics 

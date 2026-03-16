@@ -29,6 +29,7 @@ async def generate_normal_audio(transcripts_dir, client, output_dir_name):
                 voice="marin", # Recommended for quality by OpenAI
                 input=clean_sentence,
                 response_format="pcm" 
+                # Add an instruction here to speak intentiaonally in a normal and flat tone for better audio to audio understanding
             )
 
             # Append this sentence's audio to our master buffer

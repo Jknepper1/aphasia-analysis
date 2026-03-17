@@ -25,6 +25,10 @@ def transcribe_morphotag(aphasia_dir_name, output_dir_name):
         # Swap the .wav extension for the TalkBank .cha extension
         base_name = os.path.splitext(filename)[0]
         output_path = os.path.join(output_dir, f"{base_name}.cha")
+
+        if os.path.exists(output_path):
+            print(f"\n[{i+1}/{len(files)}] Skipping {filename} (Audio file already exists)...")
+            continue
         
         try:
             # 1. Load the audio file into a Batchalign Document

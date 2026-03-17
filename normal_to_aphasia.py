@@ -27,6 +27,10 @@ async def generate_aphasia_audio(prompt, api_key, normal_dir_name, aphasia_dir_n
         input_path = os.path.join(input_dir, filename)
         output_path = os.path.join(output_dir, filename)
 
+        if os.path.exists(output_path):
+            print(f"\n[{i+1}/{len(files)}] Skipping {filename} (Audio file already exists)...")
+            continue
+
         while retry_count < max_retries and not success:
             try:
                 # Open a FRESH connection for every file to ensure data isolation

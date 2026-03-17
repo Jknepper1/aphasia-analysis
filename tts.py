@@ -11,6 +11,14 @@ async def generate_normal_audio(transcripts_dir, client, output_dir_name):
     for filename in files:
         print(f"\n--- Processing Document: {filename} ---")
         file_path = os.path.join(transcripts_dir, filename)
+
+        # Save the combined buffer as a single .wav file
+        base_name = os.path.splitext(filename)[0]
+        speech_file = os.path.join(output_dir, f"{base_name}.wav")
+        
+        if os.path.exists(speech_file):
+            print(f"\n--- Skipping Document: {filename} (Audio file already exists) ---")
+            continue
         
         with open(file_path, "r", encoding="utf-8") as f:
             lines = f.read().splitlines()
@@ -42,10 +50,6 @@ async def generate_normal_audio(transcripts_dir, client, output_dir_name):
         if len(combined_pcm_audio) == 0:
             print(f"Skipping {filename}, no valid audio generated.")
             continue
-
-        # Save the combined buffer as a single .wav file
-        base_name = os.path.splitext(filename)[0]
-        speech_file = os.path.join(output_dir, f"{base_name}.wav")
 
         # Write the WAV file using Python's built-in wave library
         with wave.open(speech_file, "wb") as wav_file:

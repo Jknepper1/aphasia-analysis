@@ -9,14 +9,14 @@ dir_path = input("Pick dir path to randomly select transcripts from: ")
 
 filenames = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
-random_sample = random.sample(filenames, k=30)
+random_sample = random.sample(filenames, k=60)
 
 for i in random_sample:
     print(i)
 
 for i in random_sample:
     in_path = os.path.join(dir_path, i)
-    out_path  =  os.path.join(".", "src", "transcripts", "selected_sandwich")
+    out_path  =  os.path.join(".", "src", "transcripts", "selected_cinderella")
     shutil.copy2(in_path, out_path)
 
 

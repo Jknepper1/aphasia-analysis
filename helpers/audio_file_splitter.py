@@ -6,9 +6,8 @@ from pathlib import Path
 # --- Configuration ---
 CHAT_DIR = Path("/aphasia/CHATtrans")
 AUDIO_DIR = Path("/aphasia/audioFiles")
-OUTPUT_DIR = Path("/aphasia/cropped_audio") 
-
 TARGET_SECTION = input("What section would you like to pull? (e.g., Sandwich, Cinderella): ").strip()
+OUTPUT_DIR = Path(f"/aphasia/{TARGET_SECTION}") 
 
 # --- Regex Patterns ---
 TARGET_GEM_PATTERN = re.compile(rf'^@G:\s*{TARGET_SECTION}', re.IGNORECASE)
@@ -72,7 +71,7 @@ def find_matching_audio(base_name):
     return None
 
 def process_files():
-    for cha_path in CHAT_DIR.glob("*.cha"):
+    for cha_path in CHAT_DIR.rglob("*.cha"):
         base_name = cha_path.stem
         audio_path = find_matching_audio(base_name)
         

@@ -63,11 +63,11 @@ def parse_cha_for_timestamps(cha_file):
     return start_ms, end_ms
 
 def find_matching_audio(base_name):
-    """Finds the corresponding audio file, handling different extensions."""
+    """Recursively searches for the corresponding audio file."""
     for ext in ['.wav', '.mp3', '.mp4', '.m4a']:
-        audio_path = AUDIO_DIR / f"{base_name}{ext}"
-        if audio_path.exists():
-            return audio_path
+        # .rglob searches all nested subfolders inside the audio directory
+        for file_path in AUDIO_DIR.rglob(f"{base_name}{ext}"):
+            return file_path
     return None
 
 def process_files():

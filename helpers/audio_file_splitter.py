@@ -4,10 +4,10 @@ import subprocess
 from pathlib import Path
 
 # --- Configuration ---
-CHAT_DIR = Path("/aphasia/CHATtrans")
-AUDIO_DIR = Path("/aphasia/audioFiles")
+CHAT_DIR = Path("./CHATtrans")
+AUDIO_DIR = Path("./audioFiles")
 TARGET_SECTION = input("What section would you like to pull? (e.g., Sandwich, Cinderella): ").strip()
-OUTPUT_DIR = Path(f"/aphasia/{TARGET_SECTION}") 
+OUTPUT_DIR = Path(f"./{TARGET_SECTION}") 
 
 # --- Regex Patterns ---
 TARGET_GEM_PATTERN = re.compile(rf'^@G:\s*{TARGET_SECTION}', re.IGNORECASE)

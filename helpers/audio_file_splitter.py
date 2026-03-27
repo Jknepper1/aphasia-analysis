@@ -101,8 +101,10 @@ def process_files():
         duration = end_sec - start_sec
         
         safe_section_name = TARGET_SECTION.replace(" ", "_").lower()
+        safe_group_name = aphasia_type.replace(" ", "_").lower() # Just added this
+
         # Save directly into the new group-specific folder
-        output_file = group_output_dir / f"{base_name}_{safe_section_name}{audio_path.suffix}"
+        output_file = group_output_dir / f"{base_name}_{safe_section_name}_{safe_group_name}{audio_path.suffix}"
         
         command = [
             "ffmpeg", "-y", "-v", "error", 

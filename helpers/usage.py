@@ -17,9 +17,8 @@ headers = {
 params = {
     "start_time": start_time,
     "end_time": end_time,
-    "limit": 100 # Adjust pagination limit as needed
+    "limit": 100
 }
-
 response = requests.get(url, headers=headers, params=params)
 
 if response.status_code == 200:

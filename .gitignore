@@ -12,5 +12,5 @@ cheatsheet.doc
 /final/*
 /normal/*
 /aphasia/*
-/src/transcripts/*
+/src/transcripts/talkbank*
 __pycache__

@@ -79,11 +79,19 @@ AS of now one needs to do the following to run BatchAlign2
 5. Preform analysis on resultant spreadsheet    
 
 ### Pulling plaintext sentences from .cha files
-1. Run `gem +s<Name_of group> +n +d <filenames>`
+1. Run `gem +s<Name_of group> +n +d <filenames> -t*INV`
 2. Run `flo +t* <filenames>`
 
 `+n` tells CLAN to only extract that section
 
 `+d` tells CLAN to maintain acceptable CLAN format
 
-`+t*` is where you specify speaker tier. If this breaks, just use the UI to EXCLUDE the INV tier instead of including the PAR tier
+`+/-t*` is where you specify speaker tier. If this breaks, just use the UI to EXCLUDE the INV tier instead of INCLUDE the PAR tier
+
+### Flow of acquiring Transcripts
+
+1. Start with ALL TalkBank data
+2. Lose some on running gem 
+    Some don't have the same gem name
+    Some use an INV tier other than INV like OTH for example
+3. flo_script only takes lines over 15 chars, some files only have lines under 15 chars

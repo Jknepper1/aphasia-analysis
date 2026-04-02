@@ -16,7 +16,7 @@ for i in random_sample:
 
 for i in random_sample:
     in_path = os.path.join(dir_path, i)
-    out_path  =  os.path.join(".", "src", "transcripts", "selected_cinderella")
+    out_path  =  os.path.join("..", "src", "transcripts", "ano_cinderella/ano_cinderella_sample")
     shutil.copy2(in_path, out_path)
 
 

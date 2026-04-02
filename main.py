@@ -3,7 +3,7 @@ import asyncio
 from dotenv import load_dotenv
 from openai import AsyncOpenAI
 #from audio_utils import save_as_wav, encode_audio
-from batchalign_manual import transcribe_morphotag
+#from batchalign_manual import transcribe_morphotag
 from normal_to_aphasia import generate_aphasia_audio
 from tts import generate_normal_audio
 
@@ -139,10 +139,10 @@ async def main():
         await generate_aphasia_audio(prompt, api_key, normal_dir, aphasia_dir)
         print("Speech-to-Speech ending...")
     
-    if point == "0" or point == "1" or point == "2":
-        print("BatchAlign Transcription Beginning...")
-        transcribe_morphotag(aphasia_dir, final_dir)
-        print("BatchAlign Transcription Ending...")
+    # if point == "0" or point == "1" or point == "2":
+    #     print("BatchAlign Transcription Beginning...")
+    #     transcribe_morphotag(aphasia_dir, final_dir)
+    #     print("BatchAlign Transcription Ending...")
 
 
 if __name__ == "__main__":

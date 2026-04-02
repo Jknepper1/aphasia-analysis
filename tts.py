@@ -26,7 +26,7 @@ async def generate_normal_audio(transcripts_dir, client, output_dir_name):
         # This will hold the raw audio bytes for all 20 sentences
         combined_pcm_audio = bytearray()
 
-        for i, line in enumerate(lines[1:]):
+        for i, line in enumerate(lines[::]):
             clean_sentence = line.strip()
 
             print(f"  -> Requesting TTS for sentence {i+1}...")

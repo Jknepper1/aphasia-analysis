@@ -43,6 +43,9 @@ def main():
 
     for file in os.listdir(flo_directory):
         in_directory = os.path.join(flo_directory, file)
+        # if .flo NOT in file path, just skip <------------- This might solve some problems
+        # Try and rubild broca_sandwich folder. Somewhere along the lines 130 ish files gets shrunk down to 52 and I think this script 
+        # has something to do with it. The CLAN commands may as well.
         transcript = extract_flo_lines(in_directory, file)
         if len(transcript) > 2: # prevents all the random empty files from fluffing up directory
             write_to_dir(transcript, directory + file.replace('.flo.cex', '.txt'))

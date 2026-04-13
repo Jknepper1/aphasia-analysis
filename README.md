@@ -12,6 +12,46 @@ This is a project that takes text, turns it into audio, then utilizes OpenAIs' R
 4. The files in /aphasia/<folder_name> are then run through BatchAlign2 Transcription + Morphology
     1. The results are stored in /final as .cha transcripts. *Eval commands can be run on these files*
 
+### Command-line usage
+The pipeline now supports explicit command-line flags and optional JSON configuration.
+
+Example:
+```bash
+python main.py \
+  --prompt-file broca_language_3-1.txt \
+  --transcript-folder broca_cinderella \
+  --normal-folder normal_broca \
+  --aphasia-folder aphasia_broca \
+  --final-folder final_broca \
+  --start-point 0
+```
+
+You can also use `--clean-output` to remove files from the selected output folders before running, or `--validate-only` to verify configuration without executing the pipeline.
+
+#### Configuration file
+Instead of command-line flags, you can use a JSON configuration file:
+
+```bash
+python main.py --config config.example.json
+```
+
+See `config.example.json` for the expected format.
+
+#### Validation example
+To validate your configuration and inputs without running the pipeline:
+
+```bash
+python main.py \
+  --prompt-file broca_language_3-1.txt \
+  --transcript-folder broca_cinderella \
+  --normal-folder normal_broca \
+  --aphasia-folder aphasia_broca \
+  --final-folder final_broca \
+  --validate-only
+```
+
+This will check that all required files and directories exist, and report any issues before you run the full pipeline.
+
 The reason for the complexity is due to our need to replicate specific research parameters. You will notice that a new websocket connection is opened per file when converting from normal to aphasia simulated audio. This is to remove the context window entirely as each file MUST be treated as a separate entity to simulate the indivudual nature of the human interviews in TalkBank. It is also vital to send audio rather than text through the Realtime API to simulate the actual usage of the aphasiafier tool which requires audio input.
 
 You may have trouble with setting up all of the dependencies. If you recieve an error on pkg_resources, it's because your .venv is too moder nso you need to install an older version of setup_tools using `pip install "setuptools<70". Make sure you run the command from inside your .venv or you'll probably cook your other python projects

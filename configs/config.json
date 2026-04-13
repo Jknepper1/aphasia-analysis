@@ -1,0 +1,10 @@
+{
+  "prompt_file": "broca_language_3-1.txt",
+  "transcript_folder": "broca_cinderella",
+  "normal_folder": "normal_broca",
+  "aphasia_folder": "aphasia_broca",
+  "final_folder": "final_broca",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

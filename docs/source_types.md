@@ -13,7 +13,7 @@ The final step on each data type is running the `eval` command in the CLAN softw
 
 ### Human Coded Control
 
-This is control files from talkbank. The transcripts are unaltered from their original human coded state.
+This is control files from talkbank. The transcripts are unaltered from their original human coded state. 
 
 1. The filtered control folder is utilized for this data
 2. Desired gem is extracted from full transcripts:
@@ -24,7 +24,7 @@ This is control files from talkbank. The transcripts are unaltered from their or
 
 ### BatchAlign2 Control
 
-This is the control files from TalkBank stripped of their human coding down to plaintext. Then processed through BatchAlign2 transcribe and morphotag
+This is the control files from TalkBank stripped of their human coding down to plaintext. Then processed through BatchAlign2 transcribe and morphotaging
 
 1. The filtered control folder is utilized for this data
 2. Desired gem is extracted from full transcripts:
@@ -41,6 +41,8 @@ This is the control files from TalkBank stripped of their human coding down to p
 
 ### Aphasiafied w/ BatchAlign2 
 
+This is the Aphasiafier data as processed through the entire pipeline as it stands. We may cycle out BatchAlign2 Morphology if it comes out that CLAN Mor tagging is superior
+
 1. The sample of 60 control files is utilized as the base for this data
 2. Run the entire aphasiafier script on 60 control files
     - Run script with `--start-point` set to `0`
@@ -50,7 +52,7 @@ This is the control files from TalkBank stripped of their human coding down to p
 
 ### Human Coded Aphasia
 
-This is TalkBank data in its purset form. Human coded transcripts of the selected aphasia type.
+This is TalkBank data in its purset form. Human coded transcripts of the selected aphasia type, filtered by Gem (section)
 
 1. Use the desired aphasia type folder under `talkbank_sorted_HC` as base
 2. Desired gem is extracted from full transcripts:

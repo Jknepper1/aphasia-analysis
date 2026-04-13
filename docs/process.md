@@ -57,11 +57,10 @@ Each of these folders contains plain `.txt` documents. The `tts.py` script reads
 This is the pipeline entry point.
 
 It performs these tasks:
-- Creates and validates the `normal/`, `aphasia/`, and `final/` directories.
-- Prompts the user to select:
-  - a prompt file from `src/prompts/`
-  - a transcript directory from `src/transcripts/`
-  - target output subfolders inside `normal/`, `aphasia/`, and `final/`
+- Parses command-line arguments or an optional JSON config file.
+- Validates required paths and input files before running.
+- Creates and resolves the `normal/`, `aphasia/`, and `final/` output directories.
+- Optionally cleans output directories when `--clean-output` is set.
 - Depending on the selected start point, the pipeline runs:
   - `generate_normal_audio()` to create normal audio from transcripts
   - `generate_aphasia_audio()` to simulate aphasia audio from normal audio
@@ -71,6 +70,8 @@ The start-point options are:
 - `0` — run the full pipeline from normal TTS through aphasia simulation and transcription
 - `1` — start at speech-to-speech aphasia simulation
 - `2` — run only the BatchAlign transcription stage
+
+If no CLI arguments are provided, `main.py` still supports an interactive fallback, but the preferred execution mode is now explicit CLI/config-driven.
 
 ### `tts.py`
 
@@ -175,18 +176,44 @@ Generated files are written as `.cha` and are suitable for further CLAN/EVAL ana
 
 ## Typical Pipeline Execution
 
-1. Prepare the transcript source directory under `src/transcripts/`.
-2. Choose a prompt file from `src/prompts/`.
-3. Run `python main.py`.
-4. In the interactive prompts:
-   - select the start point (`0`, `1`, or `2`)
-   - select the transcript folder
-   - select the output subfolder names for `normal/`, `aphasia/`, and `final/`
-5. If starting at point `0`:
-   - `tts.py` generates normal audio into `normal/<subfolder>/`
-   - `normal_to_aphasia.py` generates aphasia audio into `aphasia/<subfolder>/`
-   - `batchalign_manual.py` transcribes aphasia audio into `final/<subfolder>/`
-6. After `final/` transcripts are generated, use CLAN / BatchAlign evaluation tools externally to compute analysis metrics.
+Preferred command-line execution:
+
+```bash
+python main.py \
+  --prompt-file broca_language_3-1.txt \
+  --transcript-folder broca_cinderella \
+  --normal-folder normal_broca \
+  --aphasia-folder aphasia_broca \
+  --final-folder final_broca \
+  --start-point 0
+```
+
+Validation-only check:
+
+```bash
+python main.py \
+  --prompt-file broca_language_3-1.txt \
+  --transcript-folder broca_cinderella \
+  --normal-folder normal_broca \
+  --aphasia-folder aphasia_broca \
+  --final-folder final_broca \
+  --validate-only
+```
+
+Optional JSON config execution:
+
+```bash
+python main.py --config config.example.json
+```
+
+If no CLI arguments are supplied, the script will preserve an interactive setup flow as a fallback.
+
+Runtime behavior for start point `0`:
+- `tts.py` generates normal audio into `normal/<subfolder>/`
+- `normal_to_aphasia.py` generates aphasia audio into `aphasia/<subfolder>/`
+- `batchalign_manual.py` transcribes aphasia audio into `final/<subfolder>/`
+
+After `final/` transcripts are generated, use CLAN / BatchAlign evaluation tools externally to compute analysis metrics.
 
 ## Additional Notes
 

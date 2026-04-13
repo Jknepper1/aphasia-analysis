@@ -14,38 +14,15 @@ This document describes the next improvements I would plan for the `aphasia-anal
 
 ## Recommended Improvements
 
-### Remaining improvements
-These are the next items I would plan for the project:
+All planned improvements have been implemented. The pipeline now includes:
 
-### A. Strengthen dependency and environment documentation
-**Why:** The project depends on OpenAI and BatchAlign environments, and these should be documented clearly.
+- CLI/config support with start-point 3 for control data generation
+- Structured logging and validation
+- Deterministic output handling
+- Comprehensive installation and setup documentation
+- Data layout and naming conventions documentation
 
-**What to do:**
-- Add explicit `.env` setup instructions for `OPENAI_API_KEY`
-- Document Python environment creation and dependency installation
-- Clarify external BatchAlign and CLAN requirements
-
-**How to implement:**
-1. Review `requirements.txt` and update pins if needed.
-2. Add an `INSTALLATION` or `docs/setup.md` section.
-3. Include `.venv` setup instructions and recommended command sequences.
-
-### B. Add a formal data layout and naming conventions note
-**Why:** The input/output relationships are important for reproducibility.
-
-**What to do:**
-- Add a data layout section in `process.md`
-- Document naming conventions for transcript folders and output folders
-- Clarify the difference between `aphasia-analysis` outputs and broader workspace corpora
-
-**How to implement:**
-1. Expand `process.md` with a directory table or data flow section.
-2. Add a simple pipeline diagram or architecture note if useful.
-
-### C. Include a CLI argument that allows the aphasiafier to run step 0 and 2 but skip 1
-
-**Why:** This is necessary to set up the BA2 control and BA2 Aphasia data types
-
-**What to do:**
-- Add a new CLI argument to the parser
-- Add new logic flow that allows main.py to run step 0 then step 2 without step 1
+Future enhancements could include:
+- Environment documentation for dependency versions
+- Sample dataset creation
+- Automated testing harness

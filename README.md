@@ -3,6 +3,36 @@
 ## Introduction
 This is a project that takes text, turns it into audio, then utilizes OpenAIs' Realtime AI to producs audio and a transcript of the text as if spoken by someone with Aphasia. The ultimate goal of this project is to be used as a way to quickly test different prompts and eventually OpenAI realtime models for linguistic based accuracy to real people with various types of Aphasia. There could be great value to the world of sppech therapy in understanding how well AI can replicate PWAs as well as understand what their intended meaning and words are. This project is intended to build upon the Aphasiafier project by the BYU CS PCCL.
 
+## Installation
+
+1. Clone or download the project.
+
+2. Create a Python virtual environment:
+   ```bash
+   python -m venv .venv
+   .venv\Scripts\activate  # on Windows
+   ```
+
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+4. Set up environment variables:
+   Create a `.env` file in the project root with:
+   ```
+   OPENAI_API_KEY=your_api_key_here
+   ```
+   You can get an OpenAI API key from [OpenAI](https://platform.openai.com/api-keys).
+
+5. External dependencies:
+   - **BatchAlign2**: Follow the setup instructions at https://talkbank.org/0info/BA2-usage.pdf. You need to run `batchalign setup` and add your RevAI API key.
+   - **CLAN**: Install CLAN software from TalkBank. See https://talkbank.org/clan/ for installation. Also install the morphology library.
+   
+   Note: CLAN is used manually outside this pipeline for evaluation of the generated transcripts.
+
+If you encounter pkg_resources errors, install an older setuptools: `pip install "setuptools<70"`
+
 ### How the script works
 1. Reads in all files from a folder in /transcripts
 2. Utilizes tts.py to convert all files into audio files

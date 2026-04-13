@@ -41,14 +41,13 @@ This is the control files from TalkBank stripped of their human coding down to p
 
 ### Aphasiafied w/ BatchAlign2 
 
-This is the Aphasiafier data as processed through the entire pipeline as it stands. We may cycle out BatchAlign2 Morphology if it comes out that CLAN Mor tagging is superior
+This is the Aphasiafier data as processed through the entire pipeline as it stands. We may cycle out BatchAlign2 Morphology if it comes out that CLAN Mor tagging is superior.
 
-1. The sample of 60 control files is utilized as the base for this data
+1. A sample of 60 control files is utilized as the base for this data
 2. Run the entire aphasiafier script on 60 control files
     - Run script with `--start-point` set to `0`
 3. Process output files in `/final` through CLAN EVAL command
     - Run `eval`
-4. 
 
 ### Human Coded Aphasia
 

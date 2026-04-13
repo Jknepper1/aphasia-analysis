@@ -33,6 +33,47 @@ The pipeline lives in the `aphasia-analysis` folder. Its important subfolders ar
 - `final/` — output folder for BatchAlign-produced `.cha` transcripts.
 - `helpers/` — utility scripts used for auxiliary processing or data management.
 
+## Data Layout and Naming Conventions
+
+### Input Data Organization
+
+Transcripts are organized in `src/transcripts/` with folders named by condition:
+
+- `<aphasia_type>_<task>/` e.g., `broca_cinderella/`, `cont_sandwich/`
+
+Where:
+- `aphasia_type`: ano (anomic), broca, cont (control), wern (Wernicke)
+- `task`: cinderella or sandwich
+
+### Output Folder Naming
+
+Output folders under `normal/`, `aphasia/`, `final/` follow the pattern:
+
+- `<type>_<condition>/` e.g., `normal_broca_cinderella/`, `aphasia_broca_cinderella/`, `final_broca_cinderella/`
+
+### Data Types
+
+The pipeline supports generating different types of data for comparison (see `docs/source_types.md` for details):
+
+1. **Human Coded Control**: Unaltered TalkBank transcripts, processed manually with CLAN.
+
+2. **BatchAlign2 Control**: Plaintext transcripts processed through TTS and BatchAlign transcription only (use `--start-point 3`).
+
+3. **Aphasiafied w/ BatchAlign2**: Full pipeline output - TTS -> Aphasia simulation -> BatchAlign transcription (use `--start-point 0`).
+
+4. **Human Coded Aphasia**: Unaltered TalkBank aphasia transcripts, processed manually with CLAN.
+
+5. **BatchAlign2 Aphasia**: Human coded aphasia transcripts converted to plaintext, then processed through BatchAlign transcription only (use `--start-point 2`).
+
+### Spreadsheet Naming Convention
+
+Output spreadsheets from CLAN EVAL follow: `<speech_type>_<transcript_section>_<prompt>_<source>`
+
+Where:
+- `source`: BA2 (BatchAlign only), AI (full pipeline), HC (human coded)
+
+This ensures consistent naming for analysis and comparison.
+
 ## Transcript Source Structure
 
 The input transcript data is organized as directories inside `src/transcripts/`.
@@ -70,6 +111,7 @@ The start-point options are:
 - `0` — run the full pipeline from normal TTS through aphasia simulation and transcription
 - `1` — start at speech-to-speech aphasia simulation
 - `2` — run only the BatchAlign transcription stage
+- `3` — run TTS and transcription, skipping aphasia simulation (for control data)
 
 If no CLI arguments are provided, `main.py` still supports an interactive fallback, but the preferred execution mode is now explicit CLI/config-driven.
 

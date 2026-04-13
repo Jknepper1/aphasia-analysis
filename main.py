@@ -45,9 +45,9 @@ def parse_args(argv=None):
     parser.add_argument("--final-folder", type=str, help="Name of target folder under final/")
     parser.add_argument(
         "--start-point",
-        choices=["0", "1", "2"],
+        choices=["0", "1", "2", "3"],
         default="0",
-        help="Pipeline start point: 0=tts->aphasia->transcribe, 1=aphasia->transcribe, 2=transcribe only",
+        help="Pipeline start point: 0=tts->aphasia->transcribe, 1=aphasia->transcribe, 2=transcribe only, 3=tts->transcribe (skip aphasia)",
     )
     parser.add_argument(
         "--clean-output",
@@ -95,8 +95,8 @@ def merge_config(args):
 
 def resolve_paths(config):
     start_point = str(config.get("start_point", "0"))
-    if start_point not in {"0", "1", "2"}:
-        raise ValidationError("start_point must be one of 0, 1, or 2")
+    if start_point not in {"0", "1", "2", "3"}:
+        raise ValidationError("start_point must be one of 0, 1, 2, or 3")
 
     paths = {
         "prompt_file": None,
@@ -107,23 +107,26 @@ def resolve_paths(config):
         "start_point": start_point,
     }
 
+    if start_point in {"0", "3"}:
+        transcript_folder = config.get("transcript_folder")
+        if not transcript_folder:
+            raise ValidationError("transcript-folder is required for start-point 0 or 3")
+        paths["transcript_folder"] = resolve_transcript_path(transcript_folder)
+
     if start_point in {"0", "1"}:
         prompt_file = config.get("prompt_file")
         if not prompt_file:
             raise ValidationError("prompt-file is required for start-point 0 or 1")
         paths["prompt_file"] = resolve_prompt_path(prompt_file)
 
-    if start_point == "0":
-        transcript_folder = config.get("transcript_folder")
-        if not transcript_folder:
-            raise ValidationError("transcript-folder is required for start-point 0")
-        paths["transcript_folder"] = resolve_transcript_path(transcript_folder)
-
-    if start_point in {"0", "1"}:
+    if start_point in {"0", "1", "3"}:
         paths["normal_folder"] = resolve_output_folder("normal", config.get("normal_folder"))
 
     if start_point in {"0", "1", "2"}:
         paths["aphasia_folder"] = resolve_output_folder("aphasia", config.get("aphasia_folder"))
+        paths["final_folder"] = resolve_output_folder("final", config.get("final_folder"))
+
+    if start_point == "3":
         paths["final_folder"] = resolve_output_folder("final", config.get("final_folder"))
 
     return paths
@@ -138,6 +141,9 @@ def clean_directories(paths):
         clean_directory(paths["aphasia_folder"])
         clean_directory(paths["final_folder"])
     elif paths["start_point"] == "2":
+        clean_directory(paths["final_folder"])
+    elif paths["start_point"] == "3":
+        clean_directory(paths["normal_folder"])
         clean_directory(paths["final_folder"])
 
 
@@ -266,6 +272,14 @@ async def main():
     if start_point in {"0", "1", "2"}:
         logger.info("Starting BatchAlign transcription stage.")
         transcribe_morphotag(str(paths["aphasia_folder"]), str(paths["final_folder"]))
+        logger.info("Completed BatchAlign transcription stage.")
+
+    if start_point == "3":
+        logger.info("Starting TTS stage.")
+        await generate_normal_audio(paths["transcript_folder"], client, str(paths["normal_folder"]))
+        logger.info("Completed TTS stage.")
+        logger.info("Starting BatchAlign transcription stage on normal audio.")
+        transcribe_morphotag(str(paths["normal_folder"]), str(paths["final_folder"]))
         logger.info("Completed BatchAlign transcription stage.")
 
 

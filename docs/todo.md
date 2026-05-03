@@ -1,6 +1,6 @@
 # Project Improvement Plan
 
-## Role: Project Manager
+## Role: AI Project Manager (lol)
 
 This document describes the next improvements I would plan for the `aphasia-analysis` project based on the current codebase and structure. It does not change the code. It only defines priorities, rationale, and implementation steps.
 

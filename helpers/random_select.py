@@ -1,11 +1,17 @@
 import os
 import random
 import shutil
+import sys
 
 # Pick a specific seed in order to have reproducible steps for research paper
 random.seed(2026)
 
-dir_path = input("Pick dir path to randomly select transcripts from: ")
+if len(sys.argv) != 3:
+    print("Usage: python random_select.py <input_dir_path> <output_path>")
+    sys.exit(1)
+
+dir_path = sys.argv[1]
+out_path = sys.argv[2]
 
 filenames = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
@@ -16,7 +22,6 @@ for i in random_sample:
 
 for i in random_sample:
     in_path = os.path.join(dir_path, i)
-    out_path  =  os.path.join("..", "src", "transcripts", "ano_cinderella/ano_cinderella_sample")
     shutil.copy2(in_path, out_path)
 
 

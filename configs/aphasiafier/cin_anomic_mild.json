@@ -1,0 +1,10 @@
+{
+  "prompt_file": "anomic_mild.txt",
+  "transcript_folder": "cinderella/anomic",
+  "normal_folder": "Anomic_mild",
+  "aphasia_folder": "anomic_mild",
+  "final_folder": "Anomic_mild",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

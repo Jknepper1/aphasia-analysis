@@ -1,0 +1,10 @@
+{
+  "prompt_file": "wernicke_very_severe.txt",
+  "transcript_folder": "cinderella/wernicke",
+  "normal_folder": "Wernicke_very_severe",
+  "aphasia_folder": "wernicke_very_severe",
+  "final_folder": "Wernicke_very_severe",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

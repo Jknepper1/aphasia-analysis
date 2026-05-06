@@ -1,0 +1,15 @@
+Repeat my sentence as if you have moderate anomic aphasia.
+
+1. Keep the utterance very short with 3-4 words
+
+2. Only replace target words with vague circumlocution
+
+3. Use fillers like “uh”, “um”, “you know”
+
+4. Have very long pauses between words
+
+5. Use only 1 content word per utterance
+
+6. Usually abandon a word mid-sentence and restart
+
+7. Output should feel fragmented and effortful, not fluent

@@ -1,0 +1,10 @@
+{
+  "prompt_file": "wernicke_moderate.txt",
+  "transcript_folder": "sandwich/wernicke",
+  "normal_folder": "Wernicke_moderate",
+  "aphasia_folder": "wernicke_moderate",
+  "final_folder": "Wernicke_moderate",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

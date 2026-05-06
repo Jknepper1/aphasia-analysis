@@ -1,0 +1,10 @@
+{
+  "prompt_file": "broca_zero_shot.txt",
+  "transcript_folder": "sandwich/broca",
+  "normal_folder": "Broca_zero_shot",
+  "aphasia_folder": "broca_zero_shot",
+  "final_folder": "Broca_zero_shot",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

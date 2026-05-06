@@ -1,0 +1,10 @@
+{
+  "prompt_file": "broca_language_3-1.txt",
+  "transcript_folder": "sandwich/broca",
+  "normal_folder": "Broca_language_3-1",
+  "aphasia_folder": "broca_language_3-1",
+  "final_folder": "Broca_language_3-1",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

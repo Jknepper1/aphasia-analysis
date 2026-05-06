@@ -1,6 +1,7 @@
 
 # Filter for lines starting with %flo:
 import os
+import sys
 
 def extract_flo_lines(file_path, filename):
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -15,8 +16,8 @@ def extract_flo_lines(file_path, filename):
                 # Clean the line: remove prefix, strip whitespace
                 clean_content = line[len('%flo:'):].strip()
                 
-                # Requirement: only lines > 20 chars (excluding filename)
-                if len(clean_content) > 15:
+                # Requirement: only lines > 10 chars (excluding filename)
+                if len(clean_content) > 10:
                     # Format: "filename: content"
                     flo_lines.append(clean_content)
         elif line.startswith('*INV') or line.startswith('*OTH'):
@@ -32,10 +33,14 @@ def write_to_dir(sentences, output_file_path):
     output_file.close()
 
 def main():
-    flo_directory = input("Enter the path to the directory containing the .flo.cex files: ")
-    subfolder = input("Enter subfolder of ./src/transcripts to store control files: ")
+    if len(sys.argv) != 3:
+        print("Usage: python flo_grab.py <flo_directory> <subfolder>")
+        sys.exit(1)
+    
+    flo_directory = sys.argv[1]
+    subfolder = sys.argv[2]
    
-    directory = f"../src/transcripts/{subfolder}/"
+    directory = f"{subfolder}/"
 
     if not os.path.exists(directory):
         print(f"Directory {directory} not found. Creating it...")

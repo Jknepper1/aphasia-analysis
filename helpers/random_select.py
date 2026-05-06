@@ -16,9 +16,12 @@ out_path = sys.argv[2]
 filenames = [f for f in os.listdir(dir_path) if os.path.isfile(os.path.join(dir_path, f))]
 
 random_sample = random.sample(filenames, k=60)
+total = 0
 
 for i in random_sample:
-    print(i)
+    total +=1
+
+print(f"Total files selected: {total}")
 
 for i in random_sample:
     in_path = os.path.join(dir_path, i)

@@ -1,0 +1,10 @@
+{
+  "prompt_file": "",
+  "transcript_folder": "cinderella/control",
+  "normal_folder": "Control_baseline",
+  "aphasia_folder": "control_baseline",
+  "final_folder": "Control_baseline",
+  "start_point": "3",
+  "clean_output": false,
+  "validate_only": false
+}

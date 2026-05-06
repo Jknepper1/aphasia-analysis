@@ -7,8 +7,8 @@ logger = logging.getLogger(__name__)
 
 logger.info("Loading BatchAlign pipeline...")
 rev = ba.RevEngine(lang="eng", num_speakers=1)
-morphosyntax = ba.StanzaEngine()
-nlp = ba.BatchalignPipeline(rev, morphosyntax)
+# morphosyntax = ba.StanzaEngine()
+nlp = ba.BatchalignPipeline(rev)
 
 def transcribe_morphotag(aphasia_dir_name, output_dir_name):
     input_dir = os.path.join(aphasia_dir_name)

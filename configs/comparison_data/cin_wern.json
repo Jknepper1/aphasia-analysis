@@ -1,9 +1,9 @@
 {
   "prompt_file": "",
   "transcript_folder": "cinderella/wernicke",
-  "normal_folder": "Wernincke_baseline",
-  "aphasia_folder": "wernicke_baseline",
-  "final_folder": "Wernicke_baseline",
+  "normal_folder": "cin_Wernincke_baseline",
+  "aphasia_folder": "cin_wernicke_baseline",
+  "final_folder": "cin_Wernicke_baseline",
   "start_point": "3",
   "clean_output": false,
   "validate_only": false

@@ -1,9 +1,9 @@
 {
   "prompt_file": "",
   "transcript_folder": "sandwich/control",
-  "normal_folder": "Control_baseline",
-  "aphasia_folder": "control_baseline",
-  "final_folder": "Control_baseline",
+  "normal_folder": "san_Control_baseline",
+  "aphasia_folder": "san_control_baseline",
+  "final_folder": "san_Control_baseline",
   "start_point": "3",
   "clean_output": false,
   "validate_only": false

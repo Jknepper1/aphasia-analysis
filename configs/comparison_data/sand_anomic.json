@@ -1,9 +1,9 @@
 {
   "prompt_file": "",
   "transcript_folder": "sandwich/anomic",
-  "normal_folder": "Anomic_baseline",
-  "aphasia_folder": "anomic_baseline",
-  "final_folder": "Anomic_baseline",
+  "normal_folder": "san_Anomic_baseline",
+  "aphasia_folder": "san_anomic_baseline",
+  "final_folder": "san_Anomic_baseline",
   "start_point": "3",
   "clean_output": false,
   "validate_only": false

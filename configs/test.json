@@ -1,0 +1,10 @@
+{
+  "prompt_file": "anomic_mild.txt",
+  "transcript_folder": "test",
+  "normal_folder": "test",
+  "aphasia_folder": "test",
+  "final_folder": "test",
+  "start_point": "0",
+  "clean_output": false,
+  "validate_only": false
+}

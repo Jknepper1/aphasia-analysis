@@ -37,7 +37,7 @@ def parse_args(argv=None):
     )
     parser.add_argument("--config", type=str, help="Optional JSON config file.")
     parser.add_argument("--prompt-file", type=str, help="Prompt file path or name under src/prompts/")
-    parser.add_argument("--transcript-folder", type=str, help="Transcript folder path or name under src/transcripts/")
+    parser.add_argument("--transcript-folder", type=str, help="Transcript folder path or name under src/sampled_transcripts/")
     parser.add_argument("--normal-folder", type=str, help="Name of target folder under normal/")
     parser.add_argument("--aphasia-folder", type=str, help="Name of target folder under aphasia/")
     parser.add_argument("--final-folder", type=str, help="Name of target folder under final/")
@@ -168,7 +168,7 @@ def interactive_setup():
     transcripts_dir = None
     if start_point == "0":
         while True:
-            transcript_input = input("Input a set of transcripts from /src/transcripts/: ").strip()
+            transcript_input = input("Input a set of transcripts from /src/sampled_transcripts/: ").strip()
             try:
                 transcripts_dir = resolve_transcript_path(transcript_input)
                 validate_transcript_folder(transcripts_dir)

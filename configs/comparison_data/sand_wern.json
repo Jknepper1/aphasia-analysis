@@ -1,9 +1,9 @@
 {
   "prompt_file": "",
   "transcript_folder": "sandwich/wernicke",
-  "normal_folder": "Wernincke_baseline",
-  "aphasia_folder": "wernicke_baseline",
-  "final_folder": "Wernicke_baseline",
+  "normal_folder": "san_Wernincke_baseline",
+  "aphasia_folder": "san_wernicke_baseline",
+  "final_folder": "san_Wernicke_baseline",
   "start_point": "3",
   "clean_output": false,
   "validate_only": false

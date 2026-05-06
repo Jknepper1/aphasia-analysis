@@ -1,9 +1,9 @@
 {
   "prompt_file": "anomic_moderate.txt",
   "transcript_folder": "cinderella/anomic",
-  "normal_folder": "Anomic_moderate",
-  "aphasia_folder": "anomic_moderate",
-  "final_folder": "Anomic_moderate",
+  "normal_folder": "cin_Anomic_moderate",
+  "aphasia_folder": "cin_anomic_moderate",
+  "final_folder": "cin_Anomic_moderate",
   "start_point": "0",
   "clean_output": false,
   "validate_only": false

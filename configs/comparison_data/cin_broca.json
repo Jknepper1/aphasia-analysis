@@ -1,9 +1,9 @@
 {
   "prompt_file": "",
   "transcript_folder": "cinderella/broca",
-  "normal_folder": "Broca_baseline",
-  "aphasia_folder": "broca_baseline",
-  "final_folder": "Broca_baseline",
+  "normal_folder": "cin_Broca_baseline",
+  "aphasia_folder": "cin_broca_baseline",
+  "final_folder": "cin_Broca_baseline",
   "start_point": "3",
   "clean_output": false,
   "validate_only": false

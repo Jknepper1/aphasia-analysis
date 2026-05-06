@@ -57,7 +57,7 @@ def resolve_prompt_path(prompt_file):
 def resolve_transcript_path(transcript_folder):
     transcript_path = Path(transcript_folder)
     if not transcript_path.is_absolute():
-        candidate = Path("src") / "transcripts" / transcript_folder
+        candidate = Path("src") / "sampled_transcripts" / transcript_folder
         if candidate.exists():
             transcript_path = candidate
         else:

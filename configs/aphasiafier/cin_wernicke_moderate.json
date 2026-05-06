@@ -1,9 +1,9 @@
 {
   "prompt_file": "wernicke_moderate.txt",
   "transcript_folder": "cinderella/wernicke",
-  "normal_folder": "Wernicke_moderate",
-  "aphasia_folder": "wernicke_moderate",
-  "final_folder": "Wernicke_moderate",
+  "normal_folder": "cin_Wernicke_moderate",
+  "aphasia_folder": "cin_wernicke_moderate",
+  "final_folder": "cin_Wernicke_moderate",
   "start_point": "0",
   "clean_output": false,
   "validate_only": false

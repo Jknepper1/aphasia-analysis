@@ -1,6 +1,6 @@
 {
   "prompt_file": "wernicke_very_severe.txt",
-  "transcript_folder": "cinderella/wernicke",
+  "transcript_folder": "cinderella/control",
   "normal_folder": "cin_Wernicke_very_severe",
   "aphasia_folder": "cin_wernicke_very_severe",
   "final_folder": "cin_Wernicke_very_severe",

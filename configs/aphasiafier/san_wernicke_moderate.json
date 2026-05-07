@@ -1,6 +1,6 @@
 {
   "prompt_file": "wernicke_moderate.txt",
-  "transcript_folder": "sandwich/wernicke",
+  "transcript_folder": "sandwich/control",
   "normal_folder": "san_Wernicke_moderate",
   "aphasia_folder": "san_wernicke_moderate",
   "final_folder": "san_Wernicke_moderate",

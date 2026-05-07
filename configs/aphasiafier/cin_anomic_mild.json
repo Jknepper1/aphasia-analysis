@@ -1,6 +1,6 @@
 {
   "prompt_file": "anomic_mild.txt",
-  "transcript_folder": "cinderella/anomic",
+  "transcript_folder": "cinderella/control",
   "normal_folder": "cin_Anomic_mild",
   "aphasia_folder": "cin_anomic_mild",
   "final_folder": "cin_Anomic_mild",

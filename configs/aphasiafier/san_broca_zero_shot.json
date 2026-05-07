@@ -1,6 +1,6 @@
 {
   "prompt_file": "broca_zero_shot.txt",
-  "transcript_folder": "sandwich/broca",
+  "transcript_folder": "sandwich/control",
   "normal_folder": "san_Broca_zero_shot",
   "aphasia_folder": "san_broca_zero_shot",
   "final_folder": "san_Broca_zero_shot",

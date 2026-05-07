@@ -1,6 +1,6 @@
 {
   "prompt_file": "broca_zero_shot.txt",
-  "transcript_folder": "cinderella/broca",
+  "transcript_folder": "cinderella/control",
   "normal_folder": "cin_Broca_zero_shot",
   "aphasia_folder": "cin_broca_zero_shot",
   "final_folder": "cin_Broca_zero_shot",

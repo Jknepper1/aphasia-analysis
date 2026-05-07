@@ -1,6 +1,6 @@
 {
   "prompt_file": "anomic_mild.txt",
-  "transcript_folder": "sandwich/anomic",
+  "transcript_folder": "sandwich/control",
   "normal_folder": "san_Anomic_mild",
   "aphasia_folder": "san_anomic_mild",
   "final_folder": "san_Anomic_mild",

@@ -1,6 +1,6 @@
 {
   "prompt_file": "broca_language_3-1.txt",
-  "transcript_folder": "sandwich/broca",
+  "transcript_folder": "sandwich/control",
   "normal_folder": "san_Broca_language_3-1",
   "aphasia_folder": "san_broca_language_3-1",
   "final_folder": "san_Broca_language_3-1",

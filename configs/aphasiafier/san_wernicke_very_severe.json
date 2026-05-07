@@ -1,6 +1,6 @@
 {
   "prompt_file": "wernicke_very_severe.txt",
-  "transcript_folder": "sandwich/wernicke",
+  "transcript_folder": "sandwich/control",
   "normal_folder": "san_Wernicke_very_severe",
   "aphasia_folder": "san_wernicke_very_severe",
   "final_folder": "san_Wernicke_very_severe",

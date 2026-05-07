@@ -44,7 +44,7 @@ def parse_args(argv=None):
     parser.add_argument(
         "--start-point",
         choices=["0", "1", "2", "3"],
-        default="0",
+        default=None,
         help="Pipeline start point: 0=tts->aphasia->transcribe, 1=aphasia->transcribe, 2=transcribe only, 3=tts->transcribe (skip aphasia)",
     )
     parser.add_argument(

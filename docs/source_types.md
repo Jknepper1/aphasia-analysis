@@ -19,15 +19,17 @@ The final step on each data type is running the `eval` command in the CLAN softw
 
 ### BatchAlign2 Control
 
-This is the control files from TalkBank stripped of their human coding down to plaintext then processed through BatchAlign2 transcribe and morphotaging
+This is the control files from TalkBank stripped of their human coding down to plaintext then processed through BatchAlign2 transcribe
 
 1. The `control` folder under `_talkbank_samples` is the base for this data
 2. Desired gem is extracted from full transcripts:
-    - Run `gem +s<name_of_section> +n +d <filenames> +t*PAR`
+    - Run `gem +s<name_of_gem> +n +d <filenames> +t*PAR`
+    - Store in separete folder i.e. `_<name_of_gem>_gems_flo`
 3. Extracted section (gem) is converted into purely plaintext for tts processing
-    - Run `flo +t* <filenames>`
-    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.cha` transcript
+    - Run `flo +t* <filenames>` to append `%flo` line to gem files
+    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.gem.flo.cex` transcripts
 4. Selection of UP TO 60 random samples is extracted from the results of 1-3
+    - Run `random_select.py`
 5. Sample set is then processed through BatchAlign2 ONLY
     - Run aphasiafier script with `--start-point` set to `3`
     - Option `3` runs tts and the BatchAlign2 pipeline while skipping any aphasiafication
@@ -37,31 +39,34 @@ This is the control files from TalkBank stripped of their human coding down to p
 
 ### Aphasiafied w/ BatchAlign2 
 
-This is the Aphasiafier data as processed through the entire pipeline as it stands.
+This is the Aphasiafier data as processed through the entire pipeline.
 
 1. The `control` folder under `_talkbank_samples` is the base for this data
 2. Desired gem is extracted from full transcripts:
     - Run `gem +s<name_of_section> +n +d <filenames> +t*PAR`
+>Wernicke required multiple `gem` runs with different section names in order to pull at least 60 files
 3. Extracted section (gem) is converted into purely plaintext for tts processing
     - Run `flo +t* <filenames>`
-    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.cha` transcript
-4. Selection of UP TO 60 random samples is extracted from the results of 1-3
+    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.gem.flo.cex` transcripts
+4. Selection of UP TO 60 random samples is extracted from the results of 1-3 using `random_select.py`
 5. Run the entire aphasiafier script on the 60 control files
     - Run script with `--start-point` set to `0`
+    - Ensure your config uses the appropriate aphasiafication prompt
 6. Process output files in `/final` through CLAN EVAL command
     - Run `mor`
     - Run `eval`
 
 ### BatchAlign2 Aphasia
 
-Talkbank transcripts processed through BatchAlign2 without any aphasiafication added.
+Talkbank transcripts processed through BatchAlign2 without any aphasiafication added. These are used as baselines to compare against the control data. This 
+helps use provide distinction between the prompts while correcting for BatchAlign2 errors.
 
 1. Use the desired aphasia type folder under `_talkbank_samples`
 2. Desired gem is extracted from full transcripts:
     - Run `gem +s<name_of_section> +n +d <filenames> +t*PAR`
 3. Extracted section (gem) is converted into purely plaintext
     - Run `flo +t* <filenames>`
-    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.cha` transcript
+    - Execute `flo_grab.py` on resultant files to pull only the %flo lines out of the `.gem.flo.cex` transcripts
 4. Selection of UP TO 60 random samples is extracted from the results of 1-3
 5. Sample set is then processed through BatchAlign2 ONLY
     - Run aphasiafier script with `--start-point` set to `3`
